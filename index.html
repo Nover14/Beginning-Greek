@@ -47,19 +47,20 @@
         }
         .app-layout {
             width: 100%;
-            max-width: 1100px;
+            max-width: 1150px;
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            gap: 24px;
+            gap: 20px;
             position: relative;
         }
         .main-container {
             width: 100%;
-            max-width: 560px;
+            max-width: 620px;
             display: flex;
             flex-direction: column;
             gap: 16px;
+            position: relative; /* Relative anchor for adjacent reference tables */
         }
         .topic-selector-card {
             background-color: var(--panel-bg);
@@ -92,7 +93,7 @@
 
         /* Settings Card Panel */
         .settings-card {
-            width: 260px;
+            width: 250px;
             background-color: var(--panel-bg);
             border-radius: 16px;
             padding: 16px 18px;
@@ -236,20 +237,20 @@
         }
         .greek-example:hover::after { opacity: 1; }
 
-        /* Tables Panel & Matrix Layout */
+        /* Tables Panel: Positioned tightly beside main container */
         .tables-panel {
             position: absolute;
-            left: calc(100% + 20px);
+            left: calc(100% + 12px);
             top: 0;
-            width: 320px;
+            width: 280px;
             background-color: var(--panel-bg);
-            border-radius: 20px;
-            padding: 16px;
+            border-radius: 16px;
+            padding: 14px;
             border: 1px solid var(--table-border);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
             z-index: 10;
             opacity: 0;
             visibility: hidden;
@@ -259,12 +260,12 @@
         }
         .tables-panel.show { opacity: 1; visibility: visible; }
         .table-group { display: flex; flex-direction: column; gap: 6px; }
-        .table-title { font-size: 0.85rem; font-style: italic; font-weight: 600; color: var(--text-muted); }
-        .paradigm-table { width: 100%; border-collapse: collapse; font-size: 0.825rem; background-color: #ffffff; }
-        .paradigm-table th, .paradigm-table td { border: 1px solid var(--table-border); padding: 6px 8px; text-align: center; }
-        .paradigm-table thead th { font-weight: 700; font-size: 0.8rem; color: var(--btn-text); background-color: var(--table-header-bg); }
-        .paradigm-table tbody th { background-color: var(--table-header-bg); color: var(--text-muted); font-style: italic; font-weight: 600; text-align: left; white-space: nowrap; }
-        .paradigm-table td { font-family: "Georgia", "Times New Roman", serif; font-size: 0.95rem; color: var(--btn-text); }
+        .table-title { font-size: 0.8rem; font-style: italic; font-weight: 700; color: var(--text-muted); }
+        .paradigm-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; background-color: #ffffff; }
+        .paradigm-table th, .paradigm-table td { border: 1px solid var(--table-border); padding: 5px 6px; text-align: center; }
+        .paradigm-table thead th { font-weight: 700; font-size: 0.75rem; color: var(--btn-text); background-color: var(--table-header-bg); }
+        .paradigm-table tbody th { background-color: var(--table-header-bg); color: var(--text-muted); font-style: italic; font-weight: 600; text-align: left; white-space: nowrap; font-size: 0.75rem; }
+        .paradigm-table td { font-family: "Georgia", "Times New Roman", serif; font-size: 0.9rem; color: var(--btn-text); }
         
         .article-table th:nth-child(2), .article-table td:nth-child(2) { background-color: var(--col-masculine); }
         .article-table th:nth-child(3), .article-table td:nth-child(3) { background-color: var(--col-feminine); }
@@ -272,7 +273,7 @@
         .verb-table td:nth-child(1) { background-color: var(--col-verb-stem); }
         .verb-table td:nth-child(2) { background-color: var(--col-verb-ending); font-weight: 700; }
 
-        /* Definite Articles Drag & Drop Game Styles */
+        /* Definite Articles Matrix: Side-by-Side Horizontal Layout */
         .matrix-board {
             background-color: var(--panel-bg);
             border: 1px solid var(--table-border);
@@ -280,28 +281,39 @@
             padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
         }
+        .matrix-tables-row {
+            display: flex;
+            flex-direction: row;
+            gap: 12px;
+            width: 100%;
+        }
+        .matrix-tables-row .table-group {
+            flex: 1;
+            min-width: 0;
+        }
+
         .articles-pool-card {
             background-color: var(--card-bg);
             border: 1.5px dashed var(--table-border);
             border-radius: 14px;
-            padding: 14px;
+            padding: 12px;
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            min-height: 80px;
+            gap: 6px;
+            min-height: 72px;
             align-items: center;
             justify-content: center;
         }
         .article-chip {
-            padding: 6px 12px;
+            padding: 4px 10px;
             background-color: var(--panel-bg);
             border: 1.5px solid var(--btn-border);
-            border-radius: 8px;
+            border-radius: 6px;
             font-family: "Georgia", serif;
-            font-size: 1.05rem;
+            font-size: 0.95rem;
             font-weight: 700;
             color: var(--btn-text);
             cursor: grab;
@@ -316,8 +328,8 @@
             box-shadow: 0 0 0 2px #2563eb;
         }
         .drop-zone {
-            min-width: 52px;
-            height: 38px;
+            min-width: 42px;
+            height: 34px;
             border: 1.5px dashed var(--table-border);
             border-radius: 6px;
             display: flex;
@@ -391,8 +403,11 @@
         
         @media (max-width: 980px) {
             .app-layout { flex-direction: column; align-items: center; }
-            .settings-card { width: 100%; max-width: 560px; }
+            .settings-card { width: 100%; max-width: 620px; }
             .tables-panel { position: static; width: 100%; }
+        }
+        @media (max-width: 640px) {
+            .matrix-tables-row { flex-direction: column; }
         }
     </style>
 </head>
@@ -489,7 +504,7 @@
             <span class="topic-label">Grammar Module</span>
             <select id="topic-select" class="topic-dropdown">
                 <option value="alphabet">Koine Greek Alphabet</option>
-                <option value="articles">Definite Articles Matrix Game</option>
+                <option value="articles">Definite Articles</option>
                 <option value="verbs">Verb Forms (Present Active)</option>
             </select>
         </div>
@@ -515,29 +530,33 @@
         <!-- Workspace 2: Drag & Drop Game (Definite Articles) -->
         <div id="matrix-workspace" style="display: none;">
             <div class="matrix-board">
-                <div class="table-group">
-                    <div class="table-title">Singular Declension Matrix</div>
-                    <table class="paradigm-table article-table">
-                        <thead><tr><th></th><th>m.</th><th>f.</th><th>n.</th></tr></thead>
-                        <tbody>
-                            <tr><th>Nominative</th><td><div class="drop-zone" data-target="ὁ"></div></td><td><div class="drop-zone" data-target="ἡ"></div></td><td><div class="drop-zone" data-target="τό"></div></td></tr>
-                            <tr><th>Accusative</th><td><div class="drop-zone" data-target="τόν"></div></td><td><div class="drop-zone" data-target="τήν"></div></td><td><div class="drop-zone" data-target="τό"></div></td></tr>
-                            <tr><th>Genitive</th><td><div class="drop-zone" data-target="τοῦ"></div></td><td><div class="drop-zone" data-target="τῆς"></div></td><td><div class="drop-zone" data-target="τοῦ"></div></td></tr>
-                            <tr><th>Dative</th><td><div class="drop-zone" data-target="τῷ"></div></td><td><div class="drop-zone" data-target="τῇ"></div></td><td><div class="drop-zone" data-target="τῷ"></div></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="table-group">
-                    <div class="table-title">Plural Declension Matrix</div>
-                    <table class="paradigm-table article-table">
-                        <thead><tr><th></th><th>m.</th><th>f.</th><th>n.</th></tr></thead>
-                        <tbody>
-                            <tr><th>Nominative</th><td><div class="drop-zone" data-target="οἱ"></div></td><td><div class="drop-zone" data-target="αἱ"></div></td><td><div class="drop-zone" data-target="τά"></div></td></tr>
-                            <tr><th>Accusative</th><td><div class="drop-zone" data-target="τούς"></div></td><td><div class="drop-zone" data-target="τάς"></div></td><td><div class="drop-zone" data-target="τά"></div></td></tr>
-                            <tr><th>Genitive</th><td><div class="drop-zone" data-target="τῶν"></div></td><td><div class="drop-zone" data-target="τῶν"></div></td><td><div class="drop-zone" data-target="τῶν"></div></td></tr>
-                            <tr><th>Dative</th><td><div class="drop-zone" data-target="τοῖς"></div></td><td><div class="drop-zone" data-target="ταῖς"></div></td><td><div class="drop-zone" data-target="τοῖς"></div></td></tr>
-                        </tbody>
-                    </table>
+                <div class="matrix-tables-row">
+                    <!-- Singular Matrix -->
+                    <div class="table-group">
+                        <div class="table-title">Singular Declension Matrix</div>
+                        <table class="paradigm-table article-table">
+                            <thead><tr><th></th><th>m.</th><th>f.</th><th>n.</th></tr></thead>
+                            <tbody>
+                                <tr><th>Nom.</th><td><div class="drop-zone" data-target="ὁ"></div></td><td><div class="drop-zone" data-target="ἡ"></div></td><td><div class="drop-zone" data-target="τό"></div></td></tr>
+                                <tr><th>Acc.</th><td><div class="drop-zone" data-target="τόν"></div></td><td><div class="drop-zone" data-target="τήν"></div></td><td><div class="drop-zone" data-target="τό"></div></td></tr>
+                                <tr><th>Gen.</th><td><div class="drop-zone" data-target="τοῦ"></div></td><td><div class="drop-zone" data-target="τῆς"></div></td><td><div class="drop-zone" data-target="τοῦ"></div></td></tr>
+                                <tr><th>Dat.</th><td><div class="drop-zone" data-target="τῷ"></div></td><td><div class="drop-zone" data-target="τῇ"></div></td><td><div class="drop-zone" data-target="τῷ"></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Plural Matrix -->
+                    <div class="table-group">
+                        <div class="table-title">Plural Declension Matrix</div>
+                        <table class="paradigm-table article-table">
+                            <thead><tr><th></th><th>m.</th><th>f.</th><th>n.</th></tr></thead>
+                            <tbody>
+                                <tr><th>Nom.</th><td><div class="drop-zone" data-target="οἱ"></div></td><td><div class="drop-zone" data-target="αἱ"></div></td><td><div class="drop-zone" data-target="τά"></div></td></tr>
+                                <tr><th>Acc.</th><td><div class="drop-zone" data-target="τούς"></div></td><td><div class="drop-zone" data-target="τάς"></div></td><td><div class="drop-zone" data-target="τά"></div></td></tr>
+                                <tr><th>Gen.</th><td><div class="drop-zone" data-target="τῶν"></div></td><td><div class="drop-zone" data-target="τῶν"></div></td><td><div class="drop-zone" data-target="τῶν"></div></td></tr>
+                                <tr><th>Dat.</th><td><div class="drop-zone" data-target="τοῖς"></div></td><td><div class="drop-zone" data-target="ταῖς"></div></td><td><div class="drop-zone" data-target="τοῖς"></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
             <!-- Bank of Draggable Articles -->
@@ -641,7 +660,6 @@
             `
         },
         articles: {
-            // Paradigm elements for Drag and Drop Game
             items: [
                 'ὁ', 'ἡ', 'τό',
                 'τόν', 'τήν', 'τό',
@@ -699,7 +717,7 @@
     let streak = 0;
     let isEvaluated = false;
     let selections = {};
-    let selectedChipElement = null; // For click-to-place support
+    let selectedChipElement = null;
 
     // DOM Elements
     const topicSelect = document.getElementById('topic-select');
@@ -806,7 +824,7 @@
         }
     }
 
-    /* --- Articles Drag & Drop Game Engine --- */
+    /* --- Definite Articles Drag & Drop Game Engine --- */
     function initArticlesMatrixGame() {
         articlesPool.innerHTML = '';
         selectedChipElement = null;
