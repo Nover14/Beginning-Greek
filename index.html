@@ -1,807 +1,1077 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ancient Greek Learning Suite</title>
-  <style>
-    :root {
-      --bg-color: #f7f9fb;
-      --card-bg: #ebf1f7;
-      --text-color: #1a1d20;
-      --correct-color: #27ae60;
-      --incorrect-color: #c0392b;
-      --border-color: #4a5568;
-      --muted-text-color: #a0aec0;
-      --primary-accent: #0f172a;
-      
-      /* Paradigm Column Tints */
-      --col-masculine: #e0f2fe;
-      --col-feminine: #fce7f3;
-      --col-neuter: #f1f5f9;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ancient Greek Morphology Flashcards</title>
+    <style>
+        :root {
+            --page-bg: #f3f5f8;
+            --card-bg: #ebf1f6;
+            --panel-bg: #ffffff;
+            --btn-bg: #f0f4f8;
+            --btn-border: #334155;
+            --btn-text: #0f172a;
+            --btn-selected-bg: #0f172a;
+            --btn-selected-text: #ffffff;
+            --text-muted: #64748b;
+            --success: #16a34a;
+            --success-bg: #dcfce7;
+            --error: #dc2626;
+            --error-bg: #fee2e2;
+            --switch-off: #e2e8f0;
+            --switch-on: #0f172a;
+            --table-border: #cbd5e1;
+            --table-header-bg: #f8fafc;
+            
+            /* Column Tinting Palette */
+            --col-masculine: #e0f2fe; /* Light Blue */
+            --col-feminine: #fce7f3;  /* Light Pink */
+            --col-neuter: #f1f5f9;    /* Light Grey */
+            --col-verb-stem: #f1f5f9; /* Light Grey */
+            --col-verb-ending: #e0f2fe;/* Light Blue */
+        }
 
-    * {
-      box-sizing: border-box;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      min-height: 100vh;
-      margin: 0;
-      padding: 20px 20px 60px 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--page-bg);
+            color: var(--btn-text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 32px 24px;
+            position: relative;
+        }
 
-    /* Top Module Navigation Bar */
-    .module-nav {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 24px;
-      background: #ffffff;
-      padding: 6px;
-      border-radius: 12px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-      z-index: 10;
-    }
+        /* Outer Layout Wrapper */
+        .app-layout {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            min-height: 660px;
+        }
 
-    .nav-btn {
-      padding: 8px 18px;
-      border: none;
-      background: transparent;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: #64748b;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
+        /* Centered Primary Workspace */
+        .main-container {
+            width: 100%;
+            max-width: 520px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+        }
 
-    .nav-btn.active {
-      background-color: var(--primary-accent);
-      color: #ffffff;
-    }
+        /* Topic Control Dropdown */
+        .topic-selector-card {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--table-border);
+            border-radius: 14px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
 
-    .main-container {
-      width: 100%;
-      max-width: 600px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+        .topic-label {
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
 
-    .module-view {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+        .topic-dropdown {
+            background-color: var(--btn-bg);
+            border: 1.5px solid var(--btn-border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--btn-text);
+            cursor: pointer;
+            outline: none;
+            transition: all 0.15s ease;
+        }
 
-    .hidden {
-      display: none !important;
-    }
+        .topic-dropdown:focus {
+            border-color: #000;
+        }
 
-    /* Main Flashcard Container */
-    .card {
-      position: relative;
-      background-color: var(--card-bg);
-      border-radius: 18px;
-      width: 100%;
-      height: 200px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 24px;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
-      padding: 0 20px;
-    }
+        /* Bottom-Left Anchored Toggle Dock */
+        .settings-card {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 220px;
+            background-color: var(--panel-bg);
+            border-radius: 16px;
+            padding: 16px 18px;
+            border: 1px solid var(--table-border);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            z-index: 20;
+        }
 
-    /* Audio Speaker Button */
-    .audio-btn {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: none;
-      border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      color: #4a5568;
-      transition: all 0.2s ease;
-    }
+        /* Switch Row Formatting */
+        .switch-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            width: 100%;
+        }
 
-    .audio-btn:hover {
-      color: #1a202c;
-      background-color: rgba(0, 0, 0, 0.06);
-    }
+        .switch-text {
+            font-size: 0.85rem;
+            color: var(--btn-text);
+            font-weight: 600;
+        }
 
-    .greek-prompt {
-      font-family: "Times New Roman", Georgia, serif;
-      font-size: 3.5rem;
-      color: #111;
-      letter-spacing: 1px;
-      text-align: center;
-      word-break: break-word;
-    }
+        .switch-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 42px;
+            height: 22px;
+        }
 
-    .prompt-subtitle {
-      font-size: 0.9rem;
-      color: #64748b;
-      margin-top: 6px;
-      font-weight: 500;
-    }
+        .switch-wrapper input[type="checkbox"] {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
 
-    /* Grid Layouts */
-    .options-grid-24 {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 8px;
-      width: 100%;
-      margin-bottom: 24px;
-    }
+        .switch-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--switch-off);
+            border-radius: 999px;
+            transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-    .options-grid-articles {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      width: 100%;
-      margin-bottom: 24px;
-    }
+        .switch-slider::before {
+            content: "";
+            position: absolute;
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+        }
 
-    .btn {
-      width: 100%;
-      min-height: 52px;
-      background-color: #edf2f7;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 6px 2px;
-      font-size: 1.15rem;
-      font-weight: 600;
-      font-family: "Times New Roman", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      color: #1a202c;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        .switch-wrapper input[type="checkbox"]:checked + .switch-slider {
+            background-color: var(--switch-on);
+        }
 
-    .btn:hover {
-      background-color: #e2e8f0;
-    }
+        .switch-wrapper input[type="checkbox"]:checked + .switch-slider::before {
+            transform: translateX(20px);
+        }
 
-    .btn.correct {
-      background-color: var(--correct-color) !important;
-      color: white !important;
-      border-color: var(--correct-color) !important;
-    }
+        /* Target Flashcard Display */
+        .flashcard-display {
+            width: 100%;
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            height: 190px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        }
 
-    .btn.incorrect {
-      background-color: var(--incorrect-color) !important;
-      color: white !important;
-      border-color: var(--incorrect-color) !important;
-    }
+        .target-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
 
-    /* Stats Display */
-    .stats-container {
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      gap: 36px;
-      margin-bottom: 24px;
-    }
+        .speaker-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--btn-border);
+            padding: 4px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.15s ease;
+        }
 
-    .stat-box {
-      text-align: center;
-      min-width: 90px;
-    }
+        .speaker-icon:hover {
+            opacity: 0.7;
+        }
 
-    .stat-label {
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: #718096;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
+        .greek-target {
+            font-family: "Georgia", "Times New Roman", serif;
+            font-size: 3.5rem;
+            font-weight: 400;
+            color: var(--btn-text);
+            line-height: 1;
+        }
 
-    .stat-value {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: #1a202c;
-    }
+        /* Example text absolutely positioned to prevent shifting target word */
+        .greek-example {
+            font-family: "Georgia", "Times New Roman", serif;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            cursor: help;
+        }
 
-    .stat-divider {
-      width: 1px;
-      height: 32px;
-      background-color: #cbd5e0;
-      align-self: center;
-    }
+        .greek-example::after {
+            content: attr(data-translation);
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #0f172a;
+            color: #ffffff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+            z-index: 30;
+        }
 
-    .reset-btn {
-      background: none;
-      border: none;
-      color: #718096;
-      font-size: 0.75rem;
-      cursor: pointer;
-      text-decoration: underline;
-      margin-top: 6px;
-      padding: 2px 4px;
-      display: inline-block;
-    }
+        .greek-example::before {
+            content: '';
+            position: absolute;
+            bottom: calc(100% + 2px);
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px;
+            border-style: solid;
+            border-color: #0f172a transparent transparent transparent;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 30;
+        }
 
-    /* Controls Stacked on Bottom Left */
-    .bottom-left-controls {
-      position: absolute;
-      bottom: 25px;
-      left: 25px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      background: rgba(255, 255, 255, 0.95);
-      padding: 16px;
-      border-radius: 12px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-      width: 280px;
-    }
+        .greek-example:hover::after,
+        .greek-example:hover::before {
+            opacity: 1;
+        }
 
-    .control-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-      font-size: 0.88rem;
-      color: #2d3748;
-      font-weight: 500;
-    }
+        /* Hint Badge */
+        .hint-badge {
+            position: absolute;
+            bottom: 16px;
+            right: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
 
-    /* Toggle Switches */
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 42px;
-      height: 22px;
-    }
+        /* Paradigm Side Panel */
+        .tables-panel {
+            position: absolute;
+            left: calc(100% + 20px);
+            top: 0;
+            width: 320px;
+            background-color: var(--panel-bg);
+            border-radius: 20px;
+            padding: 16px;
+            border: 1px solid var(--table-border);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            z-index: 10;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+            max-height: 580px;
+            overflow-y: auto;
+        }
 
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
+        .tables-panel.show {
+            opacity: 1;
+            visibility: visible;
+        }
 
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #cbd5e0;
-      transition: .3s;
-      border-radius: 22px;
-    }
+        .table-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
 
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 16px;
-      width: 16px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: .3s;
-      border-radius: 50%;
-    }
+        .table-title {
+            font-size: 0.85rem;
+            font-style: italic;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
 
-    input:checked + .slider {
-      background-color: #000000;
-    }
+        .paradigm-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.825rem;
+            background-color: #ffffff;
+        }
 
-    input:checked + .slider:before {
-      transform: translateX(20px);
-    }
+        .paradigm-table th, 
+        .paradigm-table td {
+            border: 1px solid var(--table-border);
+            padding: 6px 8px;
+            text-align: center;
+        }
 
-    .select-case {
-      padding: 4px 8px;
-      border-radius: 6px;
-      border: 1px solid #cbd5e0;
-      background-color: #fff;
-      font-size: 0.85rem;
-      color: #2d3748;
-      cursor: pointer;
-      font-weight: 500;
-    }
+        .paradigm-table thead th {
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--btn-text);
+            background-color: var(--table-header-bg);
+        }
 
-    /* Citation Footer */
-    .citation-footer {
-      position: fixed;
-      bottom: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.72rem;
-      color: var(--muted-text-color);
-      text-align: center;
-      font-family: "Times New Roman", Georgia, serif;
-      letter-spacing: 0.2px;
-      white-space: nowrap;
-      z-index: 100;
-      pointer-events: none;
-    }
+        .paradigm-table tbody th {
+            background-color: var(--table-header-bg);
+            color: var(--text-muted);
+            font-style: italic;
+            font-weight: 600;
+            text-align: left;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
 
-    @media (max-width: 850px), (max-height: 750px) {
-      body {
-        justify-content: flex-start;
-        padding: 16px 12px 30px 12px;
-        overflow-y: auto;
-      }
+        .paradigm-table td {
+            font-family: "Georgia", "Times New Roman", serif;
+            font-size: 0.95rem;
+            color: var(--btn-text);
+        }
 
-      .bottom-left-controls {
-        position: relative;
-        bottom: auto;
-        left: auto;
-        margin-top: 20px;
-        width: 100%;
-        max-width: 600px;
-      }
+        /* Article Table Tinting Rules */
+        .article-table th:nth-child(2),
+        .article-table td:nth-child(2) { background-color: var(--col-masculine); }
 
-      .citation-footer {
-        position: relative;
-        bottom: auto;
-        left: auto;
-        transform: none;
-        margin-top: 24px;
-        white-space: normal;
-        padding: 0 16px;
-      }
-    }
-  </style>
+        .article-table th:nth-child(3),
+        .article-table td:nth-child(3) { background-color: var(--col-feminine); }
+
+        .article-table th:nth-child(4),
+        .article-table td:nth-child(4) { background-color: var(--col-neuter); }
+
+        /* Verb Table Tinting Rules */
+        .verb-table td:nth-child(1) { background-color: var(--col-verb-stem); }
+        .verb-table td:nth-child(2) { background-color: var(--col-verb-ending); font-weight: 700; }
+
+        /* Options Grid */
+        .selection-groups {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .group-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .buttons-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .option-btn {
+            flex: 1;
+            padding: 12px 8px;
+            background-color: var(--btn-bg);
+            border: 1.5px solid var(--btn-border);
+            border-radius: 12px;
+            font-family: "Georgia", "Times New Roman", serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--btn-text);
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+            user-select: none;
+        }
+
+        .option-btn:hover {
+            background-color: #e2e8f0;
+        }
+
+        .option-btn.selected {
+            background-color: var(--btn-selected-bg);
+            color: var(--btn-selected-text);
+            border-color: var(--btn-selected-bg);
+        }
+
+        /* Feedback Styles */
+        .option-btn.btn-correct {
+            background-color: var(--success) !important;
+            color: #ffffff !important;
+            border-color: var(--success) !important;
+        }
+
+        .option-btn.btn-incorrect {
+            background-color: var(--error) !important;
+            color: #ffffff !important;
+            border-color: var(--error) !important;
+        }
+
+        .option-btn.btn-missed {
+            background-color: var(--success-bg) !important;
+            color: #15803d !important;
+            border: 2px dashed var(--success) !important;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--btn-border);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+            margin-top: 2px;
+        }
+
+        .action-btn:hover {
+            background-color: #0f172a;
+        }
+
+        .feedback-box {
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: none;
+            letter-spacing: 0.03em;
+        }
+
+        .feedback-box.correct {
+            display: block;
+            background-color: var(--success-bg);
+            color: var(--success);
+            border: 1px solid #bbf7d0;
+        }
+
+        .feedback-box.incorrect {
+            display: block;
+            background-color: var(--error-bg);
+            color: var(--error);
+            border: 1px solid #fecaca;
+        }
+
+        /* Metrics Display */
+        .metrics-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 36px;
+            margin-top: 4px;
+            position: relative;
+        }
+
+        .metric-item {
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: 0.725rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--btn-text);
+        }
+
+        .metric-divider {
+            width: 1px;
+            height: 38px;
+            background-color: #cbd5e1;
+        }
+
+        .reset-link {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            text-decoration: underline;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-weight: 500;
+            display: block;
+            margin: 2px auto 0 auto;
+        }
+
+        .reset-link:hover {
+            color: var(--btn-text);
+        }
+
+        /* Responsive Breakpoint */
+        @media (max-width: 980px) {
+            .app-layout {
+                flex-direction: column;
+                justify-content: flex-start;
+                min-height: auto;
+            }
+
+            .settings-card {
+                position: static;
+                width: 100%;
+                max-width: 520px;
+                margin-top: 24px;
+            }
+
+            .tables-panel {
+                position: static;
+                width: 100%;
+                margin-top: 16px;
+                max-height: none;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<!-- Top Navigation Module Selector -->
-<nav class="module-nav">
-  <button class="nav-btn active" id="btn-module-alphabet" onclick="switchModule('alphabet')">Alphabet Flashcards</button>
-  <button class="nav-btn" id="btn-module-articles" onclick="switchModule('articles')">Definite Articles</button>
-</nav>
+<div class="app-layout">
+    <!-- Centered Target Area & Workspace -->
+    <div class="main-container">
 
-<div class="main-container">
+        <!-- Top Topic Selector -->
+        <div class="topic-selector-card">
+            <span class="topic-label">Grammar Module</span>
+            <select id="topic-select" class="topic-dropdown">
+                <option value="articles">Definite Articles</option>
+                <option value="verbs">Verb Forms (Present Active)</option>
+            </select>
+        </div>
 
-  <!-- ==================== MODULE 1: ALPHABET ==================== -->
-  <div id="module-alphabet" class="module-view">
-    <div class="card">
-      <button class="audio-btn" id="speak-btn-alpha" aria-label="Pronounce letter" title="Pronounce letter">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-        </svg>
-      </button>
-      <div class="greek-prompt" id="greek-display-alpha">Α α</div>
+        <!-- Target Flashcard Display -->
+        <div class="flashcard-display">
+            <button class="speaker-icon" id="audio-btn" title="Listen">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                </svg>
+            </button>
+            <div class="target-container">
+                <span id="greek-display" class="greek-target">ὁ</span>
+                <span id="greek-example" class="greek-example" data-translation="the word">ὁ λόγος</span>
+            </div>
+            <div id="hint-badge" class="hint-badge"></div>
+        </div>
+
+        <!-- Paradigm Reference Tables Panel -->
+        <div class="tables-panel" id="tables-panel"></div>
+
+        <!-- Category Options Container (Rendered dynamically) -->
+        <div class="selection-groups" id="selection-groups-container"></div>
+
+        <button id="submit-btn" class="action-btn">Verify Answer</button>
+
+        <div id="feedback" class="feedback-box"></div>
+
+        <!-- Metrics -->
+        <div class="metrics-container">
+            <div class="metric-item">
+                <div class="metric-label">STREAK</div>
+                <div class="metric-value" id="streak-val">0</div>
+            </div>
+            <div class="metric-divider"></div>
+            <div class="metric-item">
+                <div class="metric-label">ACCURACY</div>
+                <div class="metric-value" id="accuracy-val">100%</div>
+                <button id="reset-btn" class="reset-link">Reset</button>
+            </div>
+        </div>
     </div>
 
-    <div class="options-grid-24" id="options-container-alpha"></div>
+    <!-- Toggle Controls (Bottom-Left Position) -->
+    <div class="settings-card">
+        <label class="switch-row">
+            <span class="switch-text">All On</span>
+            <span class="switch-wrapper">
+                <input type="checkbox" id="all-on-switch">
+                <span class="switch-slider"></span>
+            </span>
+        </label>
+        
+        <label class="switch-row">
+            <span class="switch-text">Example</span>
+            <span class="switch-wrapper">
+                <input type="checkbox" id="example-switch">
+                <span class="switch-slider"></span>
+            </span>
+        </label>
 
-    <div class="stats-container">
-      <div class="stat-box" id="streak-box-alpha">
-        <div class="stat-label">STREAK</div>
-        <div class="stat-value" id="streak-value-alpha">0</div>
-      </div>
-      <div class="stat-divider" id="stat-divider-alpha"></div>
-      <div class="stat-box" id="accuracy-box-alpha">
-        <div class="stat-label">ACCURACY</div>
-        <div class="stat-value" id="accuracy-value-alpha">100%</div>
-        <div><button class="reset-btn" id="reset-accuracy-alpha">Reset</button></div>
-      </div>
+        <label class="switch-row">
+            <span class="switch-text">Hint: Count</span>
+            <span class="switch-wrapper">
+                <input type="checkbox" id="hint-count-switch">
+                <span class="switch-slider"></span>
+            </span>
+        </label>
+
+        <label class="switch-row">
+            <span class="switch-text">Auto Pronounce</span>
+            <span class="switch-wrapper">
+                <input type="checkbox" id="auto-audio-switch">
+                <span class="switch-slider"></span>
+            </span>
+        </label>
+
+        <label class="switch-row">
+            <span class="switch-text">Show Tables</span>
+            <span class="switch-wrapper">
+                <input type="checkbox" id="show-tables-switch">
+                <span class="switch-slider"></span>
+            </span>
+        </label>
     </div>
-  </div>
-
-  <!-- ==================== MODULE 2: DEFINITE ARTICLES ==================== -->
-  <div id="module-articles" class="module-view hidden">
-    <div class="card">
-      <button class="audio-btn" id="speak-btn-art" aria-label="Pronounce article" title="Pronounce article">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-        </svg>
-      </button>
-      <div class="greek-prompt" id="greek-display-art">ὁ</div>
-      <div class="prompt-subtitle" id="prompt-subtitle-art">Identify the Case, Gender, & Number</div>
-    </div>
-
-    <div class="options-grid-articles" id="options-container-art"></div>
-
-    <div class="stats-container">
-      <div class="stat-box" id="streak-box-art">
-        <div class="stat-label">STREAK</div>
-        <div class="stat-value" id="streak-value-art">0</div>
-      </div>
-      <div class="stat-divider" id="stat-divider-art"></div>
-      <div class="stat-box" id="accuracy-box-art">
-        <div class="stat-label">ACCURACY</div>
-        <div class="stat-value" id="accuracy-value-art">100%</div>
-        <div><button class="reset-btn" id="reset-accuracy-art">Reset</button></div>
-      </div>
-    </div>
-  </div>
-
 </div>
-
-<!-- Dynamic Controls Panel Stacked Bottom Left -->
-<div class="bottom-left-controls">
-  <!-- Common Controls -->
-  <div class="control-item">
-    <span>Auto Pronounce</span>
-    <label class="switch">
-      <input type="checkbox" id="auto-speak-toggle">
-      <span class="slider"></span>
-    </label>
-  </div>
-
-  <div class="control-item">
-    <span>Pronounce on Answer</span>
-    <label class="switch">
-      <input type="checkbox" id="speak-on-answer-toggle">
-      <span class="slider"></span>
-    </label>
-  </div>
-
-  <!-- Alphabet Specific Controls -->
-  <div class="ctrl-alpha-only">
-    <div class="control-item" style="margin-bottom: 12px;">
-      <span>Order Mode</span>
-      <label class="switch">
-        <input type="checkbox" id="order-mode-toggle">
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <div class="control-item" style="margin-bottom: 12px;">
-      <span>Alphabetical Order</span>
-      <label class="switch">
-        <input type="checkbox" id="mode-toggle" checked>
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <div class="control-item" style="margin-bottom: 12px;">
-      <span>Weighted Frequency</span>
-      <label class="switch">
-        <input type="checkbox" id="weight-toggle" checked>
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <div class="control-item" style="margin-bottom: 12px;">
-      <span>Reverse Mode</span>
-      <label class="switch">
-        <input type="checkbox" id="reverse-toggle">
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <div class="control-item">
-      <span>Letter Case</span>
-      <select id="case-select" class="select-case">
-        <option value="both">Both (Α α)</option>
-        <option value="uppercase">Capital (Α)</option>
-        <option value="lowercase">Lowercase (α)</option>
-      </select>
-    </div>
-  </div>
-</div>
-
-<footer class="citation-footer">
-  Inspiration: Belyeu, Ricky. Conceptual framework for Greek flashcards application. Personal communication.
-</footer>
 
 <script>
-  // ==================== ALPHABET MODULE DATA ====================
-  const alphabet = [
-    { name: "Alpha", uppercase: "Α", lowercase: "α", weight: 1 },
-    { name: "Beta", uppercase: "Β", lowercase: "β", weight: 1 },
-    { name: "Gamma", uppercase: "Γ", lowercase: "γ", weight: 1.25 },
-    { name: "Delta", uppercase: "Δ", lowercase: "δ", weight: 1 },
-    { name: "Epsilon", uppercase: "Ε", lowercase: "ε", weight: 1 },
-    { name: "Zeta", uppercase: "Ζ", lowercase: "ζ", weight: 1.4 },
-    { name: "Eta", uppercase: "Η", lowercase: "η", weight: 1.4, speakAs: "Ay-ta" },
-    { name: "Theta", uppercase: "Θ", lowercase: "θ", weight: 1.25 },
-    { name: "Iota", uppercase: "Ι", lowercase: "ι", weight: 1 },
-    { name: "Kappa", uppercase: "Κ", lowercase: "κ", weight: 1 },
-    { name: "Lambda", uppercase: "Λ", lowercase: "λ", weight: 1.25 },
-    { name: "Mu", uppercase: "Μ", lowercase: "μ", weight: 1 },
-    { name: "Nu", uppercase: "Ν", lowercase: "ν", weight: 1.4 },
-    { name: "Xi", uppercase: "Ξ", lowercase: "ξ", weight: 1.6, speakAs: "Ksee" },
-    { name: "Omicron", uppercase: "Ο", lowercase: "ο", weight: 1 },
-    { name: "Pi", uppercase: "Π", lowercase: "π", weight: 1 },
-    { name: "Rho", uppercase: "Ρ", lowercase: "ρ", weight: 1.25 },
-    { name: "Sigma", uppercase: "Σ", lowercase: "σ/ς", weight: 1.15 },
-    { name: "Tau", uppercase: "Τ", lowercase: "τ", weight: 1 },
-    { name: "Upsilon", uppercase: "Υ", lowercase: "υ", weight: 1.25, speakAs: "Oop-silon" },
-    { name: "Phi", uppercase: "Φ", lowercase: "φ", weight: 1.4, speakAs: "Fee" },
-    { name: "Chi", uppercase: "Χ", lowercase: "χ", weight: 1.4, speakAs: "Khee" },
-    { name: "Psi", uppercase: "Ψ", lowercase: "ψ", weight: 1.6, speakAs: "Psee" },
-    { name: "Omega", uppercase: "Ω", lowercase: "ω", weight: 1.25 }
-  ];
+    /* Integrated Module Specifications */
+    const modulesData = {
+        articles: {
+            categories: [
+                { id: 'gender', label: 'GENDER', options: ['Masculine', 'Feminine', 'Neuter'] },
+                { id: 'number', label: 'NUMBER', options: ['Singular', 'Plural'] },
+                { id: 'case', label: 'CASE', options: ['Nom', 'Acc', 'Gen', 'Dat'] }
+            ],
+            cards: [
+                { word: 'ὁ', example: 'ὁ λόγος', translation: 'the word', gender: ['Masculine'], number: ['Singular'], case: ['Nom'] },
+                { word: 'ἡ', example: 'ἡ ἀγάπη', translation: 'the love', gender: ['Feminine'], number: ['Singular'], case: ['Nom'] },
+                { word: 'τό', example: 'τὸ φῶς', translation: 'the light', gender: ['Neuter'], number: ['Singular'], case: ['Nom', 'Acc'] },
+                { word: 'τόν', example: 'τὸν υἱόν', translation: 'the son', gender: ['Masculine'], number: ['Singular'], case: ['Acc'] },
+                { word: 'τήν', example: 'τὴν βασιλείαν', translation: 'the kingdom', gender: ['Feminine'], number: ['Singular'], case: ['Acc'] },
+                { word: 'τοῦ', example: 'τοῦ θεοῦ', translation: 'of God', gender: ['Masculine', 'Neuter'], number: ['Singular'], case: ['Gen'] },
+                { word: 'τῆς', example: 'τῆς ζωῆς', translation: 'of life', gender: ['Feminine'], number: ['Singular'], case: ['Gen'] },
+                { word: 'τῷ', example: 'τῷ θεῷ', translation: 'to God', gender: ['Masculine', 'Neuter'], number: ['Singular'], case: ['Dat'] },
+                { word: 'τῇ', example: 'τῇ ἐκκλησίᾳ', translation: 'to the church', gender: ['Feminine'], number: ['Singular'], case: ['Dat'] },
+                { word: 'οἱ', example: 'οἱ μαθηταί', translation: 'the disciples', gender: ['Masculine'], number: ['Plural'], case: ['Nom'] },
+                { word: 'αἱ', example: 'αἱ γυναῖκες', translation: 'the women', gender: ['Feminine'], number: ['Plural'], case: ['Nom'] },
+                { word: 'τά', example: 'τὰ τέκνα', translation: 'the children', gender: ['Neuter'], number: ['Plural'], case: ['Nom', 'Acc'] },
+                { word: 'τούς', example: 'τοὺς ἀποστόλους', translation: 'the apostles', gender: ['Masculine'], number: ['Plural'], case: ['Acc'] },
+                { word: 'τάς', example: 'τὰς γραφάς', translation: 'the scriptures', gender: ['Feminine'], number: ['Plural'], case: ['Acc'] },
+                { word: 'τῶν', example: 'τῶν οὐρανῶν', translation: 'of the heavens', gender: ['Masculine', 'Feminine', 'Neuter'], number: ['Plural'], case: ['Gen'] },
+                { word: 'τοῖς', example: 'τοῖς μαθηταῖς', translation: 'to the disciples', gender: ['Masculine', 'Neuter'], number: ['Plural'], case: ['Dat'] },
+                { word: 'ταῖς', example: 'ταῖς ἐκκλησίαις', translation: 'to the churches', gender: ['Feminine'], number: ['Plural'], case: ['Dat'] }
+            ],
+            tableHTML: `
+                <div class="table-group">
+                    <div class="table-title">Singular</div>
+                    <table class="paradigm-table article-table">
+                        <thead><tr><th></th><th>m.</th><th>f.</th><th>n.</th></tr></thead>
+                        <tbody>
+                            <tr><th>Nominative</th><td>ὁ</td><td>ἡ</td><td>τό</td></tr>
+                            <tr><th>Accusative</th><td>τόν</td><td>τήν</td><td>τό</td></tr>
+                            <tr><th>Genitive</th><td>τοῦ</td><td>τῆς</td><td>τοῦ</td></tr>
+                            <tr><th>Dative</th><td>τῷ</td><td>τῇ</td><td>τῷ</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-group">
+                    <div class="table-title">Plural</div>
+                    <table class="paradigm-table article-table">
+                        <thead><tr><th></th><th>m.</th><th>f.</th><th>n.</th></tr></thead>
+                        <tbody>
+                            <tr><th>Nominative</th><td>οἱ</td><td>αἱ</td><td>τά</td></tr>
+                            <tr><th>Accusative</th><td>τούς</td><td>τάς</td><td>τά</td></tr>
+                            <tr><th>Genitive</th><td>τῶν</td><td>τῶν</td><td>τῶν</td></tr>
+                            <tr><th>Dative</th><td>τοῖς</td><td>ταῖς</td><td>τοῖς</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `
+        },
+        verbs: {
+            categories: [
+                { id: 'person', label: 'PERSON', options: ['1st', '2nd', '3rd'] },
+                { id: 'number', label: 'NUMBER', options: ['Singular', 'Plural'] }
+            ],
+            cards: [
+                // βαίνω (go)
+                { word: 'βαίνω', example: 'βαίνω εἰς τὸν οἶκον', translation: 'I go into the house', person: ['1st'], number: ['Singular'] },
+                { word: 'βαίνεις', example: 'βαίνεις εἰς τὴν πόλιν', translation: 'you go to the city', person: ['2nd'], number: ['Singular'] },
+                { word: 'βαίνει', example: 'βαίνει εἰς τὸ ἱερόν', translation: 'he/she/it goes into the temple', person: ['3rd'], number: ['Singular'] },
+                { word: 'βαίνομεν', example: 'βαίνομεν εἰς τὸν ἀγρόν', translation: 'we go to the field', person: ['1st'], number: ['Plural'] },
+                { word: 'βαίνετε', example: 'βαίνετε εἰς τὴν ὁδόν', translation: 'you (pl.) go onto the road', person: ['2nd'], number: ['Plural'] },
+                { word: 'βαίνουσι(ν)', example: 'βαίνουσιν εἰς τὴν θάλασσαν', translation: 'they go to the sea', person: ['3rd'], number: ['Plural'] },
 
-  // ==================== DEFINITE ARTICLES DATA ====================
-  const articles = [
-    { text: "ὁ", case: "Nom", gender: "Masc", number: "Sg", label: "Nom Masc Sg" },
-    { text: "ἡ", case: "Nom", gender: "Fem", number: "Sg", label: "Nom Fem Sg" },
-    { text: "τό", case: "Nom/Acc", gender: "Neut", number: "Sg", label: "Nom/Acc Neut Sg" },
-    { text: "τοῦ", case: "Gen", gender: "Masc/Neut", number: "Sg", label: "Gen Masc/Neut Sg" },
-    { text: "τῆς", case: "Gen", gender: "Fem", number: "Sg", label: "Gen Fem Sg" },
-    { text: "τῷ", case: "Dat", gender: "Masc/Neut", number: "Sg", label: "Dat Masc/Neut Sg" },
-    { text: "τῇ", case: "Dat", gender: "Fem", number: "Sg", label: "Dat Fem Sg" },
-    { text: "τόν", case: "Acc", gender: "Masc", number: "Sg", label: "Acc Masc Sg" },
-    { text: "τήν", case: "Acc", gender: "Fem", number: "Sg", label: "Acc Fem Sg" },
-    { text: "οἱ", case: "Nom", gender: "Masc", number: "Pl", label: "Nom Masc Pl" },
-    { text: "αἱ", case: "Nom", gender: "Fem", number: "Pl", label: "Nom Fem Pl" },
-    { text: "τά", case: "Nom/Acc", gender: "Neut", number: "Pl", label: "Nom/Acc Neut Pl" },
-    { text: "τῶν", case: "Gen", gender: "All", number: "Pl", label: "Gen Pl (All)" },
-    { text: "τοῖς", case: "Dat", gender: "Masc/Neut", number: "Pl", label: "Dat Masc/Neut Pl" },
-    { text: "ταῖς", case: "Dat", gender: "Fem", number: "Pl", label: "Dat Fem Pl" },
-    { text: "τούς", case: "Acc", gender: "Masc", number: "Pl", label: "Acc Masc Pl" },
-    { text: "τάς", case: "Acc", gender: "Fem", number: "Pl", label: "Acc Fem Pl" }
-  ];
+                // λύω (loose / destroy)
+                { word: 'λύω', example: 'λύω τὸν δεσμόν', translation: 'I loose the bond', person: ['1st'], number: ['Singular'] },
+                { word: 'λύεις', example: 'λύεις τὸν νόμον', translation: 'you break the law', person: ['2nd'], number: ['Singular'] },
+                { word: 'λύει', example: 'λύει τὰς ἁμαρτίας', translation: 'he/she looses sins', person: ['3rd'], number: ['Singular'] },
+                { word: 'λύομεν', example: 'λύομεν τὰ δεσμά', translation: 'we break the bonds', person: ['1st'], number: ['Plural'] },
+                { word: 'λύετε', example: 'λύετε τὸν ναόν', translation: 'you (pl.) destroy the temple', person: ['2nd'], number: ['Plural'] },
+                { word: 'λύουσι(ν)', example: 'λύουσιν τὴν εἰρήνην', translation: 'they break the peace', person: ['3rd'], number: ['Plural'] },
 
-  // Module State
-  let activeModule = 'alphabet';
-  
-  // Alphabet State
-  let alphaIndex = 0, alphaScore = 0, alphaTotal = 0, alphaStreak = 0;
-  let isProcessingAlpha = false, unweightedDeck = [], orderStep = 0, orderGridItems = [];
+                // γράφω (write)
+                { word: 'γράφω', example: 'γράφω τὴν ἐπιστολήν', translation: 'I write the letter', person: ['1st'], number: ['Singular'] },
+                { word: 'γράφεις', example: 'γράφεις τὸν λόγον', translation: 'you write the word', person: ['2nd'], number: ['Singular'] },
+                { word: 'γράφει', example: 'γράφει τὸ βιβλίον', translation: 'he/she writes the book', person: ['3rd'], number: ['Singular'] },
+                { word: 'γράφομεν', example: 'γράφομεν τὰς ἐντολάς', translation: 'we write the commandments', person: ['1st'], number: ['Plural'] },
+                { word: 'γράφετε', example: 'γράφετε τοὺς νόμους', translation: 'you (pl.) write the laws', person: ['2nd'], number: ['Plural'] },
+                { word: 'γράφουσι(ν)', example: 'γράφουσιν τὰ ὀνόματα', translation: 'they write the names', person: ['3rd'], number: ['Plural'] },
 
-  // Articles State
-  let artIndex = 0, artScore = 0, artTotal = 0, artStreak = 0;
-  let isProcessingArt = false;
+                // λέγω (say / speak)
+                { word: 'λέγω', example: 'λέγω τὴν ἀλήθειαν', translation: 'I speak the truth', person: ['1st'], number: ['Singular'] },
+                { word: 'λέγεις', example: 'λέγεις παραβολήν', translation: 'you tell a parable', person: ['2nd'], number: ['Singular'] },
+                { word: 'λέγει', example: 'λέγει τοῖς μαθηταῖς', translation: 'he says to the disciples', person: ['3rd'], number: ['Singular'] },
+                { word: 'λέγομεν', example: 'λέγομεν περὶ τοῦ θεοῦ', translation: 'we speak concerning God', person: ['1st'], number: ['Plural'] },
+                { word: 'λέγετε', example: 'λέγετε τὸν λόγον', translation: 'you (pl.) speak the word', person: ['2nd'], number: ['Plural'] },
+                { word: 'λέγουσι(ν)', example: 'λέγουσιν ταῦτα', translation: 'they say these things', person: ['3rd'], number: ['Plural'] },
 
-  // DOM Elements
-  const autoSpeakToggle = document.getElementById('auto-speak-toggle');
-  const speakOnAnswerToggle = document.getElementById('speak-on-answer-toggle');
+                // φέρω (bear / bring)
+                { word: 'φέρω', example: 'φέρω τὸν καρπόν', translation: 'I bear the fruit', person: ['1st'], number: ['Singular'] },
+                { word: 'φέρεις', example: 'φέρεις τὸ δῶρον', translation: 'you bring the gift', person: ['2nd'], number: ['Singular'] },
+                { word: 'φέρει', example: 'φέρει τὸ φῶς', translation: 'he/she brings light', person: ['3rd'], number: ['Singular'] },
+                { word: 'φέρομεν', example: 'φέρομεν τοὺς ἄρτους', translation: 'we bring the loaves', person: ['1st'], number: ['Plural'] },
+                { word: 'φέρετε', example: 'φέρετε τὸν σταυρόν', translation: 'you (pl.) carry the cross', person: ['2nd'], number: ['Plural'] },
+                { word: 'φέρουσι(ν)', example: 'φέρουσιν τὰ δῶρα', translation: 'they bring gifts', person: ['3rd'], number: ['Plural'] },
 
-  // Switch Active Module View
-  function switchModule(moduleName) {
-    activeModule = moduleName;
-    document.getElementById('btn-module-alphabet').classList.toggle('active', moduleName === 'alphabet');
-    document.getElementById('btn-module-articles').classList.toggle('active', moduleName === 'articles');
-    
-    document.getElementById('module-alphabet').classList.toggle('hidden', moduleName !== 'alphabet');
-    document.getElementById('module-articles').classList.toggle('hidden', moduleName !== 'articles');
-
-    document.querySelector('.ctrl-alpha-only').classList.toggle('hidden', moduleName !== 'alphabet');
-
-    if (moduleName === 'alphabet') loadAlphaCard();
-    else loadArticleCard();
-  }
-
-  // ==================== ALPHABET MODULE LOGIC ====================
-  const greekDisplayAlpha = document.getElementById('greek-display-alpha');
-  const optionsContainerAlpha = document.getElementById('options-container-alpha');
-  const orderModeToggle = document.getElementById('order-mode-toggle');
-  const modeToggle = document.getElementById('mode-toggle');
-  const weightToggle = document.getElementById('weight-toggle');
-  const reverseToggle = document.getElementById('reverse-toggle');
-  const caseSelect = document.getElementById('case-select');
-
-  function speakAlphabetLetter() {
-    if (!('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    const index = orderModeToggle.checked ? (orderStep < alphabet.length ? orderStep : 0) : alphaIndex;
-    const item = alphabet[index];
-    const utterance = new SpeechSynthesisUtterance(item.speakAs || item.name);
-    utterance.rate = 0.9;
-    window.speechSynthesis.speak(utterance);
-  }
-
-  function getFormattedLetter(item) {
-    const mode = caseSelect.value;
-    if (mode === 'uppercase') return item.uppercase;
-    if (mode === 'lowercase') return item.lowercase;
-    return `${item.uppercase} ${item.lowercase}`;
-  }
-
-  function loadAlphaCard() {
-    if (orderModeToggle.checked) { startOrderMode(); return; }
-    isProcessingAlpha = false;
-    const item = alphabet[alphaIndex];
-    const isReverse = reverseToggle.checked;
-
-    greekDisplayAlpha.textContent = isReverse ? item.name : getFormattedLetter(item);
-    const correctAnswer = isReverse ? getFormattedLetter(item) : item.name;
-
-    optionsContainerAlpha.innerHTML = '';
-    alphabet.forEach(opt => {
-      const optionText = isReverse ? getFormattedLetter(opt) : opt.name;
-      const button = document.createElement('button');
-      button.className = 'btn';
-      button.textContent = optionText;
-      button.onclick = () => handleAlphaSelection(button, optionText, correctAnswer);
-      optionsContainerAlpha.appendChild(button);
-    });
-
-    if (autoSpeakToggle.checked) speakAlphabetLetter();
-  }
-
-  function handleAlphaSelection(btn, selected, correct) {
-    if (isProcessingAlpha) return;
-    isProcessingAlpha = true;
-    alphaTotal++;
-
-    if (speakOnAnswerToggle.checked) speakAlphabetLetter();
-
-    if (selected === correct) {
-      btn.classList.add('correct');
-      alphaScore++; alphaStreak++;
-    } else {
-      btn.classList.add('incorrect');
-      alphaStreak = 0;
-      Array.from(optionsContainerAlpha.children).forEach(b => {
-        if (b.textContent === correct) b.classList.add('correct');
-      });
-    }
-
-    updateAlphaStats();
-    setTimeout(() => {
-      alphaIndex = modeToggle.checked ? (alphaIndex + 1) % alphabet.length : Math.floor(Math.random() * alphabet.length);
-      loadAlphaCard();
-    }, 900);
-  }
-
-  function startOrderMode() {
-    orderStep = 0; isProcessingAlpha = false;
-    orderGridItems = Array.from({ length: alphabet.length }, (_, i) => i);
-    for (let i = orderGridItems.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [orderGridItems[i], orderGridItems[j]] = [orderGridItems[j], orderGridItems[i]];
-    }
-    renderOrderBoard();
-  }
-
-  function renderOrderBoard() {
-    const isReverse = reverseToggle.checked;
-    greekDisplayAlpha.textContent = `Order: ${orderStep} / ${alphabet.length}`;
-    optionsContainerAlpha.innerHTML = '';
-
-    orderGridItems.forEach(itemIndex => {
-      const item = alphabet[itemIndex];
-      const optionText = isReverse ? getFormattedLetter(item) : item.name;
-      const button = document.createElement('button');
-      button.className = 'btn';
-      button.textContent = optionText;
-
-      if (itemIndex < orderStep) {
-        button.classList.add('correct');
-        button.style.pointerEvents = 'none';
-        button.style.opacity = '0.5';
-      }
-      button.onclick = () => {
-        if (itemIndex === orderStep) {
-          button.classList.add('correct');
-          orderStep++; alphaTotal++; alphaScore++;
-          if (orderStep === alphabet.length) {
-            alphaStreak++; updateAlphaStats();
-            greekDisplayAlpha.textContent = `Completed! 🎉`;
-            setTimeout(startOrderMode, 1500);
-          } else {
-            updateAlphaStats();
-            greekDisplayAlpha.textContent = `Order: ${orderStep} / ${alphabet.length}`;
-          }
-        } else {
-          button.classList.add('incorrect');
-          alphaTotal++; alphaStreak = 0; updateAlphaStats();
-          setTimeout(startOrderMode, 800);
+                // ἀκούω (hear)
+                { word: 'ἀκούω', example: 'ἀκούω τῆς φωνῆς', translation: 'I hear the voice', person: ['1st'], number: ['Singular'] },
+                { word: 'ἀκούεις', example: 'ἀκούεις τὸν λόγον', translation: 'you hear the word', person: ['2nd'], number: ['Singular'] },
+                { word: 'ἀκούει', example: 'ἀκούει τῆς ἀληθείας', translation: 'he/she hears truth', person: ['3rd'], number: ['Singular'] },
+                { word: 'ἀκούομεν', example: 'ἀκούομεν τοῦ διδασκάλου', translation: 'we listen to the teacher', person: ['1st'], number: ['Plural'] },
+                { word: 'ἀκούετε', example: 'ἀκούετε τῆς ἐντολῆς', translation: 'you (pl.) hear the command', person: ['2nd'], number: ['Plural'] },
+                { word: 'ἀκούουσι(ν)', example: 'ἀκούουσιν τὸ εὐαγγέλιον', translation: 'they hear the gospel', person: ['3rd'], number: ['Plural'] }
+            ],
+            tableHTML: `
+                <div class="table-group">
+                    <div class="table-title">Present Active Indicative Endings</div>
+                    <table class="paradigm-table verb-table">
+                        <thead>
+                            <tr><th>Stem</th><th>Ending</th><th>Meaning</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>-</td><td>ω</td><td>'I ...'</td><td>1st person s. (1 s.)</td></tr>
+                            <tr><td>-</td><td>εις</td><td>'you ...'</td><td>2nd person s. (2 s.)</td></tr>
+                            <tr><td>-</td><td>ει</td><td>'he/she/it ...'</td><td>3rd person s. (3 s.)</td></tr>
+                            <tr><td>-</td><td>ομεν</td><td>'we ...'</td><td>1st person pl. (1 pl.)</td></tr>
+                            <tr><td>-</td><td>ετε</td><td>'you (pl.) ...'</td><td>2nd person pl. (2 pl.)</td></tr>
+                            <tr><td>-</td><td>ουσι(ν)</td><td>'they ...'</td><td>3rd person pl. (3 pl.)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `
         }
-      };
-      optionsContainerAlpha.appendChild(button);
-    });
-  }
+    };
 
-  function updateAlphaStats() {
-    document.getElementById('streak-value-alpha').textContent = alphaStreak;
-    const acc = alphaTotal === 0 ? 100 : Math.round((alphaScore / alphaTotal) * 100);
-    document.getElementById('accuracy-value-alpha').textContent = `${acc}%`;
-  }
+    let currentModuleKey = 'articles';
+    let currentCard = null;
+    let totalAttempts = 0;
+    let correctAttempts = 0;
+    let streak = 0;
+    let isEvaluated = false;
 
-  // ==================== DEFINITE ARTICLES LOGIC ====================
-  const greekDisplayArt = document.getElementById('greek-display-art');
-  const optionsContainerArt = document.getElementById('options-container-art');
+    let selections = {};
 
-  function speakArticle() {
-    if (!('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    const item = articles[artIndex];
-    const utterance = new SpeechSynthesisUtterance(item.text);
-    utterance.lang = 'el-GR';
-    utterance.rate = 0.8;
-    window.speechSynthesis.speak(utterance);
-  }
+    // DOM Elements
+    const topicSelect = document.getElementById('topic-select');
+    const selectionContainer = document.getElementById('selection-groups-container');
+    const greekDisplay = document.getElementById('greek-display');
+    const greekExample = document.getElementById('greek-example');
+    const submitBtn = document.getElementById('submit-btn');
+    const feedbackBox = document.getElementById('feedback');
+    const streakVal = document.getElementById('streak-val');
+    const accuracyVal = document.getElementById('accuracy-val');
+    const resetBtn = document.getElementById('reset-btn');
+    const audioBtn = document.getElementById('audio-btn');
+    const allOnSwitch = document.getElementById('all-on-switch');
+    const exampleSwitch = document.getElementById('example-switch');
+    const hintSwitch = document.getElementById('hint-count-switch');
+    const autoAudioSwitch = document.getElementById('auto-audio-switch');
+    const tablesSwitch = document.getElementById('show-tables-switch');
+    const hintBadge = document.getElementById('hint-badge');
+    const tablesPanel = document.getElementById('tables-panel');
 
-  function loadArticleCard() {
-    isProcessingArt = false;
-    const item = articles[artIndex];
-    greekDisplayArt.textContent = item.text;
+    function renderModuleUI() {
+        const mod = modulesData[currentModuleKey];
+        
+        // Render Tables Panel
+        tablesPanel.innerHTML = mod.tableHTML;
 
-    optionsContainerArt.innerHTML = '';
-    
-    // Select 6 options total (1 correct + 5 distractors)
-    const options = [item];
-    while (options.length < 6) {
-      const rand = articles[Math.floor(Math.random() * articles.length)];
-      if (!options.includes(rand)) options.push(rand);
+        // Render Selection Buttons
+        selectionContainer.innerHTML = '';
+        selections = {};
+
+        mod.categories.forEach(cat => {
+            selections[cat.id] = [];
+
+            const groupDiv = document.createElement('div');
+            
+            const label = document.createElement('div');
+            label.className = 'group-label';
+            label.textContent = cat.label;
+            groupDiv.appendChild(label);
+
+            const row = document.createElement('div');
+            row.className = 'buttons-row';
+            row.id = `${cat.id}-group`;
+
+            cat.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.setAttribute('data-value', opt);
+                btn.textContent = opt;
+
+                btn.addEventListener('click', () => {
+                    if (isEvaluated) return;
+                    btn.classList.toggle('selected');
+                    const val = btn.getAttribute('data-value');
+
+                    if (btn.classList.contains('selected')) {
+                        if (!selections[cat.id].includes(val)) selections[cat.id].push(val);
+                    } else {
+                        selections[cat.id] = selections[cat.id].filter(v => v !== val);
+                    }
+                });
+
+                row.appendChild(btn);
+            });
+
+            groupDiv.appendChild(row);
+            selectionContainer.appendChild(groupDiv);
+        });
+
+        loadNextCard();
     }
-    options.sort(() => Math.random() - 0.5);
 
-    options.forEach(opt => {
-      const button = document.createElement('button');
-      button.className = 'btn';
-      button.textContent = opt.label;
-      button.onclick = () => handleArtSelection(button, opt.label, item.label);
-      optionsContainerArt.appendChild(button);
-    });
-
-    if (autoSpeakToggle.checked) speakArticle();
-  }
-
-  function handleArtSelection(btn, selected, correct) {
-    if (isProcessingArt) return;
-    isProcessingArt = true;
-    artTotal++;
-
-    if (speakOnAnswerToggle.checked) speakArticle();
-
-    if (selected === correct) {
-      btn.classList.add('correct');
-      artScore++; artStreak++;
-    } else {
-      btn.classList.add('incorrect');
-      artStreak = 0;
-      Array.from(optionsContainerArt.children).forEach(b => {
-        if (b.textContent === correct) b.classList.add('correct');
-      });
+    function updateHintBadge() {
+        if (hintSwitch.checked && currentCard) {
+            const mod = modulesData[currentModuleKey];
+            let count = 1;
+            mod.categories.forEach(cat => {
+                count *= currentCard[cat.id].length;
+            });
+            hintBadge.textContent = count;
+            hintBadge.style.display = 'flex';
+        } else {
+            hintBadge.style.display = 'none';
+        }
     }
 
-    updateArtStats();
-    setTimeout(() => {
-      artIndex = Math.floor(Math.random() * articles.length);
-      loadArticleCard();
-    }, 900);
-  }
+    function updateExampleDisplay() {
+        greekExample.style.display = exampleSwitch.checked ? 'block' : 'none';
+    }
 
-  function updateArtStats() {
-    document.getElementById('streak-value-art').textContent = artStreak;
-    const acc = artTotal === 0 ? 100 : Math.round((artScore / artTotal) * 100);
-    document.getElementById('accuracy-value-art').textContent = `${acc}%`;
-  }
+    function updateTablesDisplay() {
+        if (tablesSwitch.checked) {
+            tablesPanel.classList.add('show');
+        } else {
+            tablesPanel.classList.remove('show');
+        }
+    }
 
-  // Event Listeners
-  document.getElementById('speak-btn-alpha').addEventListener('click', speakAlphabetLetter);
-  document.getElementById('speak-btn-art').addEventListener('click', speakArticle);
-  
-  document.getElementById('reset-accuracy-alpha').addEventListener('click', () => {
-    alphaScore = 0; alphaTotal = 0; updateAlphaStats();
-  });
-  
-  document.getElementById('reset-accuracy-art').addEventListener('click', () => {
-    artScore = 0; artTotal = 0; updateArtStats();
-  });
+    function playAudio() {
+        if ('speechSynthesis' in window && currentCard) {
+            window.speechSynthesis.cancel();
+            
+            // Normalize accents for simple speech synthesis parsing
+            const spokenText = currentCard.word.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-  orderModeToggle.addEventListener('change', loadAlphaCard);
-  modeToggle.addEventListener('change', loadAlphaCard);
-  reverseToggle.addEventListener('change', loadAlphaCard);
-  caseSelect.addEventListener('change', loadAlphaCard);
+            const utterance = new SpeechSynthesisUtterance(spokenText);
+            utterance.lang = 'el-GR';
+            window.speechSynthesis.speak(utterance);
+        }
+    }
 
-  // Initial Load
-  loadAlphaCard();
+    function syncAllOnStatus() {
+        allOnSwitch.checked = exampleSwitch.checked && hintSwitch.checked && autoAudioSwitch.checked && tablesSwitch.checked;
+    }
+
+    allOnSwitch.addEventListener('change', () => {
+        const isState = allOnSwitch.checked;
+        exampleSwitch.checked = isState;
+        hintSwitch.checked = isState;
+        autoAudioSwitch.checked = isState;
+        tablesSwitch.checked = isState;
+
+        updateExampleDisplay();
+        updateHintBadge();
+        updateTablesDisplay();
+    });
+
+    exampleSwitch.addEventListener('change', () => { updateExampleDisplay(); syncAllOnStatus(); });
+    hintSwitch.addEventListener('change', () => { updateHintBadge(); syncAllOnStatus(); });
+    autoAudioSwitch.addEventListener('change', syncAllOnStatus);
+    tablesSwitch.addEventListener('change', () => { updateTablesDisplay(); syncAllOnStatus(); });
+
+    function evaluateButtons() {
+        const mod = modulesData[currentModuleKey];
+        let isPerfect = true;
+
+        mod.categories.forEach(cat => {
+            const groupEl = document.getElementById(`${cat.id}-group`);
+            const buttons = groupEl.querySelectorAll('.option-btn');
+            const targetValues = currentCard[cat.id];
+
+            buttons.forEach(btn => {
+                const val = btn.getAttribute('data-value');
+                const isSelected = btn.classList.contains('selected');
+                const isTarget = targetValues.includes(val);
+
+                if (isSelected && isTarget) {
+                    btn.classList.add('btn-correct');
+                } else if (isSelected && !isTarget) {
+                    btn.classList.add('btn-incorrect');
+                    isPerfect = false;
+                } else if (!isSelected && isTarget) {
+                    btn.classList.add('btn-missed');
+                    isPerfect = false;
+                }
+            });
+        });
+
+        return isPerfect;
+    }
+
+    function loadNextCard() {
+        isEvaluated = false;
+        const mod = modulesData[currentModuleKey];
+
+        mod.categories.forEach(cat => {
+            selections[cat.id] = [];
+        });
+
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.classList.remove('selected', 'btn-correct', 'btn-incorrect', 'btn-missed');
+        });
+
+        feedbackBox.className = 'feedback-box';
+        feedbackBox.style.display = 'none';
+        submitBtn.textContent = 'Verify Answer';
+
+        const randomIndex = Math.floor(Math.random() * mod.cards.length);
+        currentCard = mod.cards[randomIndex];
+        greekDisplay.textContent = currentCard.word;
+        greekExample.textContent = currentCard.example;
+        greekExample.setAttribute('data-translation', currentCard.translation);
+
+        updateHintBadge();
+        updateExampleDisplay();
+
+        if (autoAudioSwitch.checked) {
+            playAudio();
+        }
+    }
+
+    function updateMetrics() {
+        streakVal.textContent = streak;
+        if (totalAttempts === 0) {
+            accuracyVal.textContent = '100%';
+        } else {
+            const percentage = Math.round((correctAttempts / totalAttempts) * 100);
+            accuracyVal.textContent = `${percentage}%`;
+        }
+    }
+
+    topicSelect.addEventListener('change', (e) => {
+        currentModuleKey = e.target.value;
+        renderModuleUI();
+    });
+
+    submitBtn.addEventListener('click', () => {
+        if (isEvaluated) {
+            loadNextCard();
+            return;
+        }
+
+        const mod = modulesData[currentModuleKey];
+        const missingSelections = mod.categories.some(cat => selections[cat.id].length === 0);
+
+        if (missingSelections) {
+            feedbackBox.className = 'feedback-box incorrect';
+            feedbackBox.textContent = 'Select options across all categories.';
+            return;
+        }
+
+        totalAttempts++;
+        const isCorrect = evaluateButtons();
+
+        if (isCorrect) {
+            correctAttempts++;
+            streak++;
+            feedbackBox.className = 'feedback-box correct';
+            feedbackBox.textContent = 'Correct!';
+        } else {
+            streak = 0;
+            feedbackBox.className = 'feedback-box incorrect';
+            feedbackBox.textContent = 'Incorrect';
+        }
+
+        updateMetrics();
+        isEvaluated = true;
+        submitBtn.textContent = 'Next Card';
+    });
+
+    resetBtn.addEventListener('click', () => {
+        streak = 0;
+        totalAttempts = 0;
+        correctAttempts = 0;
+        updateMetrics();
+        loadNextCard();
+    });
+
+    audioBtn.addEventListener('click', playAudio);
+
+    // Initial Execution
+    renderModuleUI();
 </script>
-
 </body>
 </html>
