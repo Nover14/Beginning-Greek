@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ancient Greek Morphology Flashcards</title>
+    <title>Ancient Greek Morphology & Alphabet Flashcards</title>
     <style>
         :root {
             --page-bg: #f3f5f8;
@@ -19,17 +19,16 @@
             --success-bg: #dcfce7;
             --error: #dc2626;
             --error-bg: #fee2e2;
-            --switch-off: #e2e8f0;
+            --switch-off: #cbd5e1;
             --switch-on: #0f172a;
             --table-border: #cbd5e1;
             --table-header-bg: #f8fafc;
             
-            /* Column Tinting Palette */
-            --col-masculine: #e0f2fe; /* Light Blue */
-            --col-feminine: #fce7f3;  /* Light Pink */
-            --col-neuter: #f1f5f9;    /* Light Grey */
-            --col-verb-stem: #f1f5f9; /* Light Grey */
-            --col-verb-ending: #e0f2fe;/* Light Blue */
+            --col-masculine: #e0f2fe;
+            --col-feminine: #fce7f3;
+            --col-neuter: #f1f5f9;
+            --col-verb-stem: #f1f5f9;
+            --col-verb-ending: #e0f2fe;
         }
         * {
             box-sizing: border-box;
@@ -45,28 +44,23 @@
             align-items: center;
             min-height: 100vh;
             padding: 32px 24px;
-            position: relative;
         }
-        /* Outer Layout Wrapper */
         .app-layout {
             width: 100%;
             max-width: 1100px;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
+            gap: 24px;
             position: relative;
-            min-height: 660px;
         }
-        /* Centered Primary Workspace */
         .main-container {
             width: 100%;
             max-width: 520px;
             display: flex;
             flex-direction: column;
             gap: 16px;
-            position: relative;
         }
-        /* Topic Control Dropdown */
         .topic-selector-card {
             background-color: var(--panel-bg);
             border: 1px solid var(--table-border);
@@ -84,27 +78,20 @@
             color: var(--text-muted);
             text-transform: uppercase;
         }
-        .topic-dropdown {
+        .topic-dropdown, .setting-dropdown {
             background-color: var(--btn-bg);
             border: 1.5px solid var(--btn-border);
             border-radius: 8px;
-            padding: 6px 12px;
-            font-size: 0.9rem;
+            padding: 6px 10px;
+            font-size: 0.85rem;
             font-weight: 700;
             color: var(--btn-text);
             cursor: pointer;
             outline: none;
-            transition: all 0.15s ease;
         }
-        .topic-dropdown:focus {
-            border-color: #000;
-        }
-        /* Bottom-Left Anchored Toggle Dock */
+        /* Restored Settings Card Panel */
         .settings-card {
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            width: 220px;
+            width: 260px;
             background-color: var(--panel-bg);
             border-radius: 16px;
             padding: 16px 18px;
@@ -112,10 +99,9 @@
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            z-index: 20;
+            gap: 12px;
+            flex-shrink: 0;
         }
-        /* Switch Row Formatting */
         .switch-row {
             display: flex;
             justify-content: space-between;
@@ -132,7 +118,7 @@
         .switch-wrapper {
             position: relative;
             display: inline-block;
-            width: 42px;
+            width: 40px;
             height: 22px;
         }
         .switch-wrapper input[type="checkbox"] {
@@ -143,10 +129,7 @@
         .switch-slider {
             position: absolute;
             cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background-color: var(--switch-off);
             border-radius: 999px;
             transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -167,9 +150,9 @@
             background-color: var(--switch-on);
         }
         .switch-wrapper input[type="checkbox"]:checked + .switch-slider::before {
-            transform: translateX(20px);
+            transform: translateX(18px);
         }
-        /* Target Flashcard Display */
+        /* Flashcard Area */
         .flashcard-display {
             width: 100%;
             background-color: var(--card-bg);
@@ -201,11 +184,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.15s ease;
         }
-        .speaker-icon:hover {
-            opacity: 0.7;
-        }
+        .speaker-icon:hover { opacity: 0.7; }
         .greek-target {
             font-family: "Georgia", "Times New Roman", serif;
             font-size: 3.5rem;
@@ -213,7 +193,6 @@
             color: var(--btn-text);
             line-height: 1;
         }
-        /* Example text absolutely positioned to prevent shifting target word */
         .greek-example {
             font-family: "Georgia", "Times New Roman", serif;
             font-size: 1.2rem;
@@ -242,29 +221,11 @@
             white-space: nowrap;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.2s ease, transform 0.2s ease;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-            z-index: 30;
-        }
-        .greek-example::before {
-            content: '';
-            position: absolute;
-            bottom: calc(100% + 2px);
-            left: 50%;
-            transform: translateX(-50%);
-            border-width: 5px;
-            border-style: solid;
-            border-color: #0f172a transparent transparent transparent;
-            opacity: 0;
-            pointer-events: none;
             transition: opacity 0.2s ease;
             z-index: 30;
         }
-        .greek-example:hover::after,
-        .greek-example:hover::before {
-            opacity: 1;
-        }
-        /* Hint Badge */
+        .greek-example:hover::after { opacity: 1; }
+        
         .hint-badge {
             position: absolute;
             bottom: 16px;
@@ -280,9 +241,8 @@
             display: none;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        /* Paradigm Side Panel */
+        /* Tables Panel */
         .tables-panel {
             position: absolute;
             left: calc(100% + 20px);
@@ -303,82 +263,25 @@
             max-height: 580px;
             overflow-y: auto;
         }
-        .tables-panel.show {
-            opacity: 1;
-            visibility: visible;
-        }
-        .table-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .table-title {
-            font-size: 0.85rem;
-            font-style: italic;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-        .paradigm-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.825rem;
-            background-color: #ffffff;
-        }
-        .paradigm-table th, 
-        .paradigm-table td {
-            border: 1px solid var(--table-border);
-            padding: 6px 8px;
-            text-align: center;
-        }
-        .paradigm-table thead th {
-            font-weight: 700;
-            font-size: 0.8rem;
-            color: var(--btn-text);
-            background-color: var(--table-header-bg);
-        }
-        .paradigm-table tbody th {
-            background-color: var(--table-header-bg);
-            color: var(--text-muted);
-            font-style: italic;
-            font-weight: 600;
-            text-align: left;
-            font-size: 0.8rem;
-            white-space: nowrap;
-        }
-        .paradigm-table td {
-            font-family: "Georgia", "Times New Roman", serif;
-            font-size: 0.95rem;
-            color: var(--btn-text);
-        }
-        /* Article Table Tinting Rules */
-        .article-table th:nth-child(2),
-        .article-table td:nth-child(2) { background-color: var(--col-masculine); }
-        .article-table th:nth-child(3),
-        .article-table td:nth-child(3) { background-color: var(--col-feminine); }
-        .article-table th:nth-child(4),
-        .article-table td:nth-child(4) { background-color: var(--col-neuter); }
-        /* Verb Table Tinting Rules */
+        .tables-panel.show { opacity: 1; visibility: visible; }
+        .table-group { display: flex; flex-direction: column; gap: 6px; }
+        .table-title { font-size: 0.85rem; font-style: italic; font-weight: 600; color: var(--text-muted); }
+        .paradigm-table { width: 100%; border-collapse: collapse; font-size: 0.825rem; background-color: #ffffff; }
+        .paradigm-table th, .paradigm-table td { border: 1px solid var(--table-border); padding: 6px 8px; text-align: center; }
+        .paradigm-table thead th { font-weight: 700; font-size: 0.8rem; color: var(--btn-text); background-color: var(--table-header-bg); }
+        .paradigm-table tbody th { background-color: var(--table-header-bg); color: var(--text-muted); font-style: italic; font-weight: 600; text-align: left; white-space: nowrap; }
+        .paradigm-table td { font-family: "Georgia", "Times New Roman", serif; font-size: 0.95rem; color: var(--btn-text); }
+        
+        .article-table th:nth-child(2), .article-table td:nth-child(2) { background-color: var(--col-masculine); }
+        .article-table th:nth-child(3), .article-table td:nth-child(3) { background-color: var(--col-feminine); }
+        .article-table th:nth-child(4), .article-table td:nth-child(4) { background-color: var(--col-neuter); }
         .verb-table td:nth-child(1) { background-color: var(--col-verb-stem); }
         .verb-table td:nth-child(2) { background-color: var(--col-verb-ending); font-weight: 700; }
-        /* Options Grid */
-        .selection-groups {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-        .group-label {
-            font-size: 0.7rem;
-            font-weight: 800;
-            letter-spacing: 0.08em;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-            text-transform: uppercase;
-        }
-        .buttons-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
+        
+        /* Options Buttons */
+        .selection-groups { display: flex; flex-direction: column; gap: 14px; }
+        .group-label { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
+        .buttons-row { display: flex; flex-wrap: wrap; gap: 10px; }
         .option-btn {
             flex: 1 1 calc(25% - 10px);
             min-width: 70px;
@@ -394,30 +297,12 @@
             transition: all 0.15s ease-in-out;
             user-select: none;
         }
-        .option-btn:hover {
-            background-color: #e2e8f0;
-        }
-        .option-btn.selected {
-            background-color: var(--btn-selected-bg);
-            color: var(--btn-selected-text);
-            border-color: var(--btn-selected-bg);
-        }
-        /* Feedback Styles */
-        .option-btn.btn-correct {
-            background-color: var(--success) !important;
-            color: #ffffff !important;
-            border-color: var(--success) !important;
-        }
-        .option-btn.btn-incorrect {
-            background-color: var(--error) !important;
-            color: #ffffff !important;
-            border-color: var(--error) !important;
-        }
-        .option-btn.btn-missed {
-            background-color: var(--success-bg) !important;
-            color: #15803d !important;
-            border: 2px dashed var(--success) !important;
-        }
+        .option-btn:hover { background-color: #e2e8f0; }
+        .option-btn.selected { background-color: var(--btn-selected-bg); color: var(--btn-selected-text); border-color: var(--btn-selected-bg); }
+        .option-btn.btn-correct { background-color: var(--success) !important; color: #ffffff !important; border-color: var(--success) !important; }
+        .option-btn.btn-incorrect { background-color: var(--error) !important; color: #ffffff !important; border-color: var(--error) !important; }
+        .option-btn.btn-missed { background-color: var(--success-bg) !important; color: #15803d !important; border: 2px dashed var(--success) !important; }
+        
         .action-btn {
             width: 100%;
             padding: 14px;
@@ -429,102 +314,115 @@
             border-radius: 12px;
             cursor: pointer;
             transition: background-color 0.15s ease;
-            margin-top: 2px;
         }
-        .action-btn:hover {
-            background-color: #0f172a;
-        }
-        .feedback-box {
-            padding: 10px;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: 700;
-            font-size: 0.9rem;
-            display: none;
-            letter-spacing: 0.03em;
-        }
-        .feedback-box.correct {
-            display: block;
-            background-color: var(--success-bg);
-            color: var(--success);
-            border: 1px solid #bbf7d0;
-        }
-        .feedback-box.incorrect {
-            display: block;
-            background-color: var(--error-bg);
-            color: var(--error);
-            border: 1px solid #fecaca;
-        }
-        /* Metrics Display */
-        .metrics-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 36px;
-            margin-top: 4px;
-            position: relative;
-        }
-        .metric-item {
-            text-align: center;
-        }
-        .metric-label {
-            font-size: 0.725rem;
-            font-weight: 800;
-            letter-spacing: 0.08em;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
-        .metric-value {
-            font-size: 1.75rem;
-            font-weight: 800;
-            color: var(--btn-text);
-        }
-        .metric-divider {
-            width: 1px;
-            height: 38px;
-            background-color: #cbd5e1;
-        }
-        .reset-link {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            text-decoration: underline;
-            font-size: 0.85rem;
-            cursor: pointer;
-            font-weight: 500;
-            display: block;
-            margin: 2px auto 0 auto;
-        }
-        .reset-link:hover {
-            color: var(--btn-text);
-        }
-        /* Responsive Breakpoint */
+        .action-btn:hover { background-color: #0f172a; }
+        .feedback-box { padding: 10px; border-radius: 10px; text-align: center; font-weight: 700; font-size: 0.9rem; display: none; }
+        .feedback-box.correct { display: block; background-color: var(--success-bg); color: var(--success); border: 1px solid #bbf7d0; }
+        .feedback-box.incorrect { display: block; background-color: var(--error-bg); color: var(--error); border: 1px solid #fecaca; }
+        
+        /* Metrics Display Control */
+        .metrics-container { display: flex; justify-content: center; align-items: center; gap: 36px; margin-top: 4px; }
+        .metric-item { text-align: center; }
+        .metric-label { font-size: 0.725rem; font-weight: 800; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 4px; }
+        .metric-value { font-size: 1.75rem; font-weight: 800; color: var(--btn-text); }
+        .metric-divider { width: 1px; height: 38px; background-color: #cbd5e1; }
+        .reset-link { background: none; border: none; color: var(--text-muted); text-decoration: underline; font-size: 0.85rem; cursor: pointer; font-weight: 500; display: block; margin: 2px auto 0 auto; }
+        
         @media (max-width: 980px) {
-            .app-layout {
-                flex-direction: column;
-                justify-content: flex-start;
-                min-height: auto;
-            }
-            .settings-card {
-                position: static;
-                width: 100%;
-                max-width: 520px;
-                margin-top: 24px;
-            }
-            .tables-panel {
-                position: static;
-                width: 100%;
-                margin-top: 16px;
-                max-height: none;
-            }
+            .app-layout { flex-direction: column; align-items: center; }
+            .settings-card { width: 100%; max-width: 520px; }
+            .tables-panel { position: static; width: 100%; }
         }
     </style>
 </head>
 <body>
 <div class="app-layout">
-    <!-- Centered Target Area & Workspace -->
+    <!-- Left Panel: Integrated Settings Dashboard -->
+    <div class="settings-card">
+        <label class="switch-row">
+            <span class="switch-text">Order Mode</span>
+            <span class="switch-wrapper">
+                <input type="checkbox" id="order-mode-switch">
+                <span class="switch-slider"></span>
+            </span>
+        </label>
+        <label class="switch-row">
+            <span class="switch-text">Alphabetical Order</span>
+            <span class="switch-wrapper">
+                <input type="checkbox" id="alphabetical-switch" checked>
+                <span class="switch-slider"></span>
+            </span>
+        </label>
+        <label class="switch-row">
+            <span class="switch-text">Weighted Frequency</span>
+            <span class="switch-wrapper">
+                <input type="checkbox" id="weighted-switch" checked>
+                <span class="switch-slider"></span>
+            </span>
+        </label>
+        <label class="switch-row">
+            <span class="switch-text">Reverse Mode</span>
+            <span class="switch-wrapper">
+                <input type="checkbox" id="reverse-mode-switch">
+                <span class="switch-slider"></span>
+            </span>
+        </label>
+        
+        <div class="switch-row" style="cursor: default;">
+            <span class="switch-text">Letter Case</span>
+            <select id="letter-case-select" class="setting-dropdown">
+                <option value="both">Both (Α α)</option>
+                <option value="upper">Upper (Α)</option>
+                <option value="lower">Lower (α)</option>
+            </select>
+        </div>
+
+        <label class="switch-row">
+            <span class="switch-text">Auto Pronounce</span>
+            <span class="switch-wrapper">
+                <input type="checkbox" id="auto-audio-switch">
+                <span class="switch-slider"></span>
+            </span>
+        </label>
+        <label class="switch-row">
+            <span class="switch-text">Pronounce on Answer</span>
+            <span class="switch-wrapper">
+                <input type="checkbox" id="pronounce-answer-switch">
+                <span class="switch-slider"></span>
+            </span>
+        </label>
+        <label class="switch-row">
+            <span class="switch-text">Show Streak</span>
+            <span class="switch-wrapper">
+                <input type="checkbox" id="show-streak-switch" checked>
+                <span class="switch-slider"></span>
+            </span>
+        </label>
+        <label class="switch-row">
+            <span class="switch-text">Show Accuracy</span>
+            <span class="switch-wrapper">
+                <input type="checkbox" id="show-accuracy-switch" checked>
+                <span class="switch-slider"></span>
+            </span>
+        </label>
+        <label class="switch-row">
+            <span class="switch-text">Show Example</span>
+            <span class="switch-wrapper">
+                <input type="checkbox" id="example-switch">
+                <span class="switch-slider"></span>
+            </span>
+        </label>
+        <label class="switch-row">
+            <span class="switch-text">Show Reference Tables</span>
+            <span class="switch-wrapper">
+                <input type="checkbox" id="show-tables-switch">
+                <span class="switch-slider"></span>
+            </span>
+        </label>
+    </div>
+
+    <!-- Main Workspace -->
     <div class="main-container">
-        <!-- Top Topic Selector -->
         <div class="topic-selector-card">
             <span class="topic-label">Grammar Module</span>
             <select id="topic-select" class="topic-dropdown">
@@ -533,7 +431,7 @@
                 <option value="verbs">Verb Forms (Present Active)</option>
             </select>
         </div>
-        <!-- Target Flashcard Display -->
+
         <div class="flashcard-display">
             <button class="speaker-icon" id="audio-btn" title="Listen">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -548,68 +446,28 @@
             </div>
             <div id="hint-badge" class="hint-badge"></div>
         </div>
-        <!-- Paradigm Reference Tables Panel -->
+
         <div class="tables-panel" id="tables-panel"></div>
-        <!-- Category Options Container (Rendered dynamically) -->
         <div class="selection-groups" id="selection-groups-container"></div>
         <button id="submit-btn" class="action-btn">Verify Answer</button>
         <div id="feedback" class="feedback-box"></div>
-        <!-- Metrics -->
-        <div class="metrics-container">
-            <div class="metric-item">
+
+        <div class="metrics-container" id="metrics-container">
+            <div class="metric-item" id="streak-box">
                 <div class="metric-label">STREAK</div>
                 <div class="metric-value" id="streak-val">0</div>
             </div>
-            <div class="metric-divider"></div>
-            <div class="metric-item">
+            <div class="metric-divider" id="metric-divider"></div>
+            <div class="metric-item" id="accuracy-box">
                 <div class="metric-label">ACCURACY</div>
                 <div class="metric-value" id="accuracy-val">100%</div>
-                <button id="reset-btn" class="reset-link">Reset</button>
             </div>
         </div>
-    </div>
-    <!-- Toggle Controls (Bottom-Left Position) -->
-    <div class="settings-card">
-        <label class="switch-row">
-            <span class="switch-text">All On</span>
-            <span class="switch-wrapper">
-                <input type="checkbox" id="all-on-switch">
-                <span class="switch-slider"></span>
-            </span>
-        </label>
-        
-        <label class="switch-row">
-            <span class="switch-text">Example</span>
-            <span class="switch-wrapper">
-                <input type="checkbox" id="example-switch">
-                <span class="switch-slider"></span>
-            </span>
-        </label>
-        <label class="switch-row">
-            <span class="switch-text">Hint: Count</span>
-            <span class="switch-wrapper">
-                <input type="checkbox" id="hint-count-switch">
-                <span class="switch-slider"></span>
-            </span>
-        </label>
-        <label class="switch-row">
-            <span class="switch-text">Auto Pronounce</span>
-            <span class="switch-wrapper">
-                <input type="checkbox" id="auto-audio-switch">
-                <span class="switch-slider"></span>
-            </span>
-        </label>
-        <label class="switch-row">
-            <span class="switch-text">Show Tables</span>
-            <span class="switch-wrapper">
-                <input type="checkbox" id="show-tables-switch">
-                <span class="switch-slider"></span>
-            </span>
-        </label>
+        <button id="reset-btn" class="reset-link">Reset Stats</button>
     </div>
 </div>
+
 <script>
-    /* Integrated Module Specifications */
     const modulesData = {
         alphabet: {
             categories: [
@@ -625,38 +483,36 @@
                 }
             ],
             cards: [
-                { word: 'Α α', example: 'Alpha', translation: 'a (father)', name: ['Alpha'] },
-                { word: 'Β β', example: 'Beta', translation: 'b (book)', name: ['Beta'] },
-                { word: 'Γ γ', example: 'Gamma', translation: 'g (go)', name: ['Gamma'] },
-                { word: 'Δ δ', example: 'Delta', translation: 'd (door)', name: ['Delta'] },
-                { word: 'Ε ε', example: 'Epsilon', translation: 'e (met)', name: ['Epsilon'] },
-                { word: 'Ζ ζ', example: 'Zeta', translation: 'z (zoo)', name: ['Zeta'] },
-                { word: 'Η η', example: 'Eta', translation: 'ē (obey)', name: ['Eta'] },
-                { word: 'Θ θ', example: 'Theta', translation: 'th (thin)', name: ['Theta'] },
-                { word: 'Ι ι', example: 'Iota', translation: 'i (machine)', name: ['Iota'] },
-                { word: 'Κ κ', example: 'Kappa', translation: 'k (kitchen)', name: ['Kappa'] },
-                { word: 'Λ λ', example: 'Lambda', translation: 'l (light)', name: ['Lambda'] },
-                { word: 'Μ μ', example: 'Mu', translation: 'm (mother)', name: ['Mu'] },
-                { word: 'Ν ν', example: 'Nu', translation: 'n (net)', name: ['Nu'] },
-                { word: 'Ξ ξ', example: 'Xi', translation: 'x (box)', name: ['Xi'] },
-                { word: 'Ο ο', example: 'Omicron', translation: 'o (lot)', name: ['Omicron'] },
-                { word: 'Π π', example: 'Pi', translation: 'p (pet)', name: ['Pi'] },
-                { word: 'Ρ ρ', example: 'Rho', translation: 'r (rod)', name: ['Rho'] },
-                { word: 'Σ σ/ς', example: 'Sigma', translation: 's (sit)', name: ['Sigma'] },
-                { word: 'Τ τ', example: 'Tau', translation: 't (top)', name: ['Tau'] },
-                { word: 'Υ υ', example: 'Upsilon', translation: 'u (flute)', name: ['Upsilon'] },
-                { word: 'Φ φ', example: 'Phi', translation: 'ph (phone)', name: ['Phi'] },
-                { word: 'Χ χ', example: 'Chi', translation: 'ch (loch)', name: ['Chi'] },
-                { word: 'Ψ ψ', example: 'Psi', translation: 'ps (lips)', name: ['Psi'] },
-                { word: 'Ω ω', example: 'Omega', translation: 'ō (tone)', name: ['Omega'] }
+                { word: 'Α α', upper: 'Α', lower: 'α', example: 'Alpha', translation: 'a (father)', name: ['Alpha'] },
+                { word: 'Β β', upper: 'Β', lower: 'β', example: 'Beta', translation: 'b (book)', name: ['Beta'] },
+                { word: 'Γ γ', upper: 'Γ', lower: 'γ', example: 'Gamma', translation: 'g (go)', name: ['Gamma'] },
+                { word: 'Δ δ', upper: 'Δ', lower: 'δ', example: 'Delta', translation: 'd (door)', name: ['Delta'] },
+                { word: 'Ε ε', upper: 'Ε', lower: 'ε', example: 'Epsilon', translation: 'e (met)', name: ['Epsilon'] },
+                { word: 'Ζ ζ', upper: 'Ζ', lower: 'ζ', example: 'Zeta', translation: 'z (zoo)', name: ['Zeta'] },
+                { word: 'Η η', upper: 'Η', lower: 'η', example: 'Eta', translation: 'ē (obey)', name: ['Eta'] },
+                { word: 'Θ θ', upper: 'Θ', lower: 'θ', example: 'Theta', translation: 'th (thin)', name: ['Theta'] },
+                { word: 'Ι ι', upper: 'Ι', lower: 'ι', example: 'Iota', translation: 'i (machine)', name: ['Iota'] },
+                { word: 'Κ κ', upper: 'Κ', lower: 'κ', example: 'Kappa', translation: 'k (kitchen)', name: ['Kappa'] },
+                { word: 'Λ λ', upper: 'Λ', lower: 'λ', example: 'Lambda', translation: 'l (light)', name: ['Lambda'] },
+                { word: 'Μ μ', upper: 'Μ', lower: 'μ', example: 'Mu', translation: 'm (mother)', name: ['Mu'] },
+                { word: 'Ν ν', upper: 'Ν', lower: 'ν', example: 'Nu', translation: 'n (net)', name: ['Nu'] },
+                { word: 'Ξ ξ', upper: 'Ξ', lower: 'ξ', example: 'Xi', translation: 'x (box)', name: ['Xi'] },
+                { word: 'Ο ο', upper: 'Ο', lower: 'ο', example: 'Omicron', translation: 'o (lot)', name: ['Omicron'] },
+                { word: 'Π π', upper: 'Π', lower: 'π', example: 'Pi', translation: 'p (pet)', name: ['Pi'] },
+                { word: 'Ρ ρ', upper: 'Ρ', lower: 'ρ', example: 'Rho', translation: 'r (rod)', name: ['Rho'] },
+                { word: 'Σ σ/ς', upper: 'Σ', lower: 'σ/ς', example: 'Sigma', translation: 's (sit)', name: ['Sigma'] },
+                { word: 'Τ τ', upper: 'Τ', lower: 'τ', example: 'Tau', translation: 't (top)', name: ['Tau'] },
+                { word: 'Υ υ', upper: 'Υ', lower: 'υ', example: 'Upsilon', translation: 'u (flute)', name: ['Upsilon'] },
+                { word: 'Φ φ', upper: 'Φ', lower: 'φ', example: 'Phi', translation: 'ph (phone)', name: ['Phi'] },
+                { word: 'Χ χ', upper: 'Χ', lower: 'χ', example: 'Chi', translation: 'ch (loch)', name: ['Chi'] },
+                { word: 'Ψ ψ', upper: 'Ψ', lower: 'ψ', example: 'Psi', translation: 'ps (lips)', name: ['Psi'] },
+                { word: 'Ω ω', upper: 'Ω', lower: 'ω', example: 'Omega', translation: 'ō (tone)', name: ['Omega'] }
             ],
             tableHTML: `
                 <div class="table-group">
                     <div class="table-title">Koine Greek Alphabet</div>
                     <table class="paradigm-table">
-                        <thead>
-                            <tr><th>Letter</th><th>Name</th><th>Sound / Transliteration</th></tr>
-                        </thead>
+                        <thead><tr><th>Letter</th><th>Name</th><th>Sound / Transliteration</th></tr></thead>
                         <tbody>
                             <tr><td>Α α</td><td>Alpha</td><td>a (father)</td></tr>
                             <tr><td>Β β</td><td>Beta</td><td>b (book)</td></tr>
@@ -745,56 +601,24 @@
                 { id: 'number', label: 'NUMBER', options: ['Singular', 'Plural'] }
             ],
             cards: [
-                // βαίνω (go)
                 { word: 'βαίνω', example: 'βαίνω εἰς τὸν οἶκον', translation: 'I go into the house', person: ['1st'], number: ['Singular'] },
                 { word: 'βαίνεις', example: 'βαίνεις εἰς τὴν πόλιν', translation: 'you go to the city', person: ['2nd'], number: ['Singular'] },
                 { word: 'βαίνει', example: 'βαίνει εἰς τὸ ἱερόν', translation: 'he/she/it goes into the temple', person: ['3rd'], number: ['Singular'] },
                 { word: 'βαίνομεν', example: 'βαίνομεν εἰς τὸν ἀγρόν', translation: 'we go to the field', person: ['1st'], number: ['Plural'] },
                 { word: 'βαίνετε', example: 'βαίνετε εἰς τὴν ὁδόν', translation: 'you (pl.) go onto the road', person: ['2nd'], number: ['Plural'] },
                 { word: 'βαίνουσι(ν)', example: 'βαίνουσιν εἰς τὴν θάλασσαν', translation: 'they go to the sea', person: ['3rd'], number: ['Plural'] },
-                // λύω (loose / destroy)
                 { word: 'λύω', example: 'λύω τὸν δεσμόν', translation: 'I loose the bond', person: ['1st'], number: ['Singular'] },
                 { word: 'λύεις', example: 'λύεις τὸν νόμον', translation: 'you break the law', person: ['2nd'], number: ['Singular'] },
                 { word: 'λύει', example: 'λύει τὰς ἁμαρτίας', translation: 'he/she looses sins', person: ['3rd'], number: ['Singular'] },
                 { word: 'λύομεν', example: 'λύομεν τὰ δεσμά', translation: 'we break the bonds', person: ['1st'], number: ['Plural'] },
                 { word: 'λύετε', example: 'λύετε τὸν ναόν', translation: 'you (pl.) destroy the temple', person: ['2nd'], number: ['Plural'] },
-                { word: 'λύουσι(ν)', example: 'λύουσιν τὴν εἰρήνην', translation: 'they break the peace', person: ['3rd'], number: ['Plural'] },
-                // γράφω (write)
-                { word: 'γράφω', example: 'γράφω τὴν ἐπιστολήν', translation: 'I write the letter', person: ['1st'], number: ['Singular'] },
-                { word: 'γράφεις', example: 'γράφεις τὸν λόγον', translation: 'you write the word', person: ['2nd'], number: ['Singular'] },
-                { word: 'γράφει', example: 'γράφει τὸ βιβλίον', translation: 'he/she writes the book', person: ['3rd'], number: ['Singular'] },
-                { word: 'γράφομεν', example: 'γράφομεν τὰς ἐντολάς', translation: 'we write the commandments', person: ['1st'], number: ['Plural'] },
-                { word: 'γράφετε', example: 'γράφετε τοὺς νόμους', translation: 'you (pl.) write the laws', person: ['2nd'], number: ['Plural'] },
-                { word: 'γράφουσι(ν)', example: 'γράφουσιν τὰ ὀνόματα', translation: 'they write the names', person: ['3rd'], number: ['Plural'] },
-                // λέγω (say / speak)
-                { word: 'λέγω', example: 'λέγω τὴν ἀλήθειαν', translation: 'I speak the truth', person: ['1st'], number: ['Singular'] },
-                { word: 'λέγεις', example: 'λέγεις παραβολήν', translation: 'you tell a parable', person: ['2nd'], number: ['Singular'] },
-                { word: 'λέγει', example: 'λέγει τοῖς μαθηταῖς', translation: 'he says to the disciples', person: ['3rd'], number: ['Singular'] },
-                { word: 'λέγομεν', example: 'λέγομεν περὶ τοῦ θεοῦ', translation: 'we speak concerning God', person: ['1st'], number: ['Plural'] },
-                { word: 'λέγετε', example: 'λέγετε τὸν λόγον', translation: 'you (pl.) speak the word', person: ['2nd'], number: ['Plural'] },
-                { word: 'λέγουσι(ν)', example: 'λέγουσιν ταῦτα', translation: 'they say these things', person: ['3rd'], number: ['Plural'] },
-                // φέρω (bear / bring)
-                { word: 'φέρω', example: 'φέρω τὸν καρπόν', translation: 'I bear the fruit', person: ['1st'], number: ['Singular'] },
-                { word: 'φέρεις', example: 'φέρεις τὸ δῶρον', translation: 'you bring the gift', person: ['2nd'], number: ['Singular'] },
-                { word: 'φέρει', example: 'φέρει τὸ φῶς', translation: 'he/she brings light', person: ['3rd'], number: ['Singular'] },
-                { word: 'φέρομεν', example: 'φέρομεν τοὺς ἄρτους', translation: 'we bring the loaves', person: ['1st'], number: ['Plural'] },
-                { word: 'φέρετε', example: 'φέρετε τὸν σταυρόν', translation: 'you (pl.) carry the cross', person: ['2nd'], number: ['Plural'] },
-                { word: 'φέρουσι(ν)', example: 'φέρουσιν τὰ δῶρα', translation: 'they bring gifts', person: ['3rd'], number: ['Plural'] },
-                // ἀκούω (hear)
-                { word: 'ἀκούω', example: 'ἀκούω τῆς φωνῆς', translation: 'I hear the voice', person: ['1st'], number: ['Singular'] },
-                { word: 'ἀκούεις', example: 'ἀκούεις τὸν λόγον', translation: 'you hear the word', person: ['2nd'], number: ['Singular'] },
-                { word: 'ἀκούει', example: 'ἀκούει τῆς ἀληθείας', translation: 'he/she hears truth', person: ['3rd'], number: ['Singular'] },
-                { word: 'ἀκούομεν', example: 'ἀκούομεν τοῦ διδασκάλου', translation: 'we listen to the teacher', person: ['1st'], number: ['Plural'] },
-                { word: 'ἀκούετε', example: 'ἀκούετε τῆς ἐντολῆς', translation: 'you (pl.) hear the command', person: ['2nd'], number: ['Plural'] },
-                { word: 'ἀκούουσι(ν)', example: 'ἀκούουσιν τὸ εὐαγγέλιον', translation: 'they hear the gospel', person: ['3rd'], number: ['Plural'] }
+                { word: 'λύουσι(ν)', example: 'λύουσιν τὴν εἰρήνην', translation: 'they break the peace', person: ['3rd'], number: ['Plural'] }
             ],
             tableHTML: `
                 <div class="table-group">
                     <div class="table-title">Present Active Indicative Endings</div>
                     <table class="paradigm-table verb-table">
-                        <thead>
-                            <tr><th>Stem</th><th>Ending</th><th>Meaning</th><th>Description</th></tr>
-                        </thead>
+                        <thead><tr><th>Stem</th><th>Ending</th><th>Meaning</th><th>Description</th></tr></thead>
                         <tbody>
                             <tr><td>-</td><td>ω</td><td>'I ...'</td><td>1st person s. (1 s.)</td></tr>
                             <tr><td>-</td><td>εις</td><td>'you ...'</td><td>2nd person s. (2 s.)</td></tr>
@@ -808,14 +632,17 @@
             `
         }
     };
+
     let currentModuleKey = 'alphabet';
     let currentCard = null;
+    let sequentialIndex = 0;
     let totalAttempts = 0;
     let correctAttempts = 0;
     let streak = 0;
     let isEvaluated = false;
     let selections = {};
-    // DOM Elements
+
+    // Elements
     const topicSelect = document.getElementById('topic-select');
     const selectionContainer = document.getElementById('selection-groups-container');
     const greekDisplay = document.getElementById('greek-display');
@@ -826,32 +653,39 @@
     const accuracyVal = document.getElementById('accuracy-val');
     const resetBtn = document.getElementById('reset-btn');
     const audioBtn = document.getElementById('audio-btn');
-    const allOnSwitch = document.getElementById('all-on-switch');
-    const exampleSwitch = document.getElementById('example-switch');
-    const hintSwitch = document.getElementById('hint-count-switch');
-    const autoAudioSwitch = document.getElementById('auto-audio-switch');
-    const tablesSwitch = document.getElementById('show-tables-switch');
-    const hintBadge = document.getElementById('hint-badge');
     const tablesPanel = document.getElementById('tables-panel');
+
+    // Controls
+    const orderModeSwitch = document.getElementById('order-mode-switch');
+    const alphabeticalSwitch = document.getElementById('alphabetical-switch');
+    const weightedSwitch = document.getElementById('weighted-switch');
+    const reverseModeSwitch = document.getElementById('reverse-mode-switch');
+    const letterCaseSelect = document.getElementById('letter-case-select');
+    const autoAudioSwitch = document.getElementById('auto-audio-switch');
+    const pronounceAnswerSwitch = document.getElementById('pronounce-answer-switch');
+    const showStreakSwitch = document.getElementById('show-streak-switch');
+    const showAccuracySwitch = document.getElementById('show-accuracy-switch');
+    const exampleSwitch = document.getElementById('example-switch');
+    const showTablesSwitch = document.getElementById('show-tables-switch');
+
     function renderModuleUI() {
         const mod = modulesData[currentModuleKey];
-        
-        // Render Tables Panel
         tablesPanel.innerHTML = mod.tableHTML;
-        // Render Selection Buttons
         selectionContainer.innerHTML = '';
         selections = {};
+
         mod.categories.forEach(cat => {
             selections[cat.id] = [];
             const groupDiv = document.createElement('div');
-            
             const label = document.createElement('div');
             label.className = 'group-label';
             label.textContent = cat.label;
             groupDiv.appendChild(label);
+
             const row = document.createElement('div');
             row.className = 'buttons-row';
             row.id = `${cat.id}-group`;
+
             cat.options.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = 'option-btn';
@@ -872,70 +706,97 @@
             groupDiv.appendChild(row);
             selectionContainer.appendChild(groupDiv);
         });
+
+        sequentialIndex = 0;
         loadNextCard();
     }
-    function updateHintBadge() {
-        if (hintSwitch.checked && currentCard) {
-            const mod = modulesData[currentModuleKey];
-            let count = 1;
-            mod.categories.forEach(cat => {
-                count *= currentCard[cat.id].length;
-            });
-            hintBadge.textContent = count;
-            hintBadge.style.display = 'flex';
-        } else {
-            hintBadge.style.display = 'none';
+
+    function formatDisplayWord(card) {
+        if (currentModuleKey === 'alphabet') {
+            const mode = letterCaseSelect.value;
+            if (mode === 'upper') return card.upper || card.word;
+            if (mode === 'lower') return card.lower || card.word;
+            return card.word;
         }
+        return card.word;
     }
-    function updateExampleDisplay() {
+
+    function loadNextCard() {
+        isEvaluated = false;
+        const mod = modulesData[currentModuleKey];
+
+        mod.categories.forEach(cat => { selections[cat.id] = []; });
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.classList.remove('selected', 'btn-correct', 'btn-incorrect', 'btn-missed');
+        });
+
+        feedbackBox.className = 'feedback-box';
+        feedbackBox.style.display = 'none';
+        submitBtn.textContent = 'Verify Answer';
+
+        let cardIndex = 0;
+        if (orderModeSwitch.checked) {
+            cardIndex = sequentialIndex % mod.cards.length;
+            if (reverseModeSwitch.checked) {
+                cardIndex = (mod.cards.length - 1) - cardIndex;
+            }
+            sequentialIndex++;
+        } else {
+            cardIndex = Math.floor(Math.random() * mod.cards.length);
+        }
+
+        currentCard = mod.cards[cardIndex];
+        greekDisplay.textContent = formatDisplayWord(currentCard);
+        greekExample.textContent = currentCard.example;
+        greekExample.setAttribute('data-translation', currentCard.translation);
+
         greekExample.style.display = exampleSwitch.checked ? 'block' : 'none';
+
+        if (autoAudioSwitch.checked) playAudio();
     }
-    function updateTablesDisplay() {
-        if (tablesSwitch.checked) {
-            tablesPanel.classList.add('show');
-        } else {
-            tablesPanel.classList.remove('show');
-        }
-    }
+
     function playAudio() {
         if ('speechSynthesis' in window && currentCard) {
             window.speechSynthesis.cancel();
-            
-            // Normalize accents for simple speech synthesis parsing
-            const spokenText = currentCard.word.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            const textToSpeak = currentCard.upper || currentCard.word;
+            const spokenText = textToSpeak.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
             const utterance = new SpeechSynthesisUtterance(spokenText);
             utterance.lang = 'el-GR';
             window.speechSynthesis.speak(utterance);
         }
     }
-    function syncAllOnStatus() {
-        allOnSwitch.checked = exampleSwitch.checked && hintSwitch.checked && autoAudioSwitch.checked && tablesSwitch.checked;
+
+    function updateMetricsUI() {
+        const streakBox = document.getElementById('streak-box');
+        const accuracyBox = document.getElementById('accuracy-box');
+        const divider = document.getElementById('metric-divider');
+
+        streakBox.style.display = showStreakSwitch.checked ? 'block' : 'none';
+        accuracyBox.style.display = showAccuracySwitch.checked ? 'block' : 'none';
+        divider.style.display = (showStreakSwitch.checked && showAccuracySwitch.checked) ? 'block' : 'none';
+
+        streakVal.textContent = streak;
+        if (totalAttempts === 0) {
+            accuracyVal.textContent = '100%';
+        } else {
+            accuracyVal.textContent = `${Math.round((correctAttempts / totalAttempts) * 100)}%`;
+        }
     }
-    allOnSwitch.addEventListener('change', () => {
-        const isState = allOnSwitch.checked;
-        exampleSwitch.checked = isState;
-        hintSwitch.checked = isState;
-        autoAudioSwitch.checked = isState;
-        tablesSwitch.checked = isState;
-        updateExampleDisplay();
-        updateHintBadge();
-        updateTablesDisplay();
-    });
-    exampleSwitch.addEventListener('change', () => { updateExampleDisplay(); syncAllOnStatus(); });
-    hintSwitch.addEventListener('change', () => { updateHintBadge(); syncAllOnStatus(); });
-    autoAudioSwitch.addEventListener('change', syncAllOnStatus);
-    tablesSwitch.addEventListener('change', () => { updateTablesDisplay(); syncAllOnStatus(); });
+
     function evaluateButtons() {
         const mod = modulesData[currentModuleKey];
         let isPerfect = true;
+
         mod.categories.forEach(cat => {
             const groupEl = document.getElementById(`${cat.id}-group`);
             const buttons = groupEl.querySelectorAll('.option-btn');
             const targetValues = currentCard[cat.id];
+
             buttons.forEach(btn => {
                 const val = btn.getAttribute('data-value');
                 const isSelected = btn.classList.contains('selected');
                 const isTarget = targetValues.includes(val);
+
                 if (isSelected && isTarget) {
                     btn.classList.add('btn-correct');
                 } else if (isSelected && !isTarget) {
@@ -949,56 +810,48 @@
         });
         return isPerfect;
     }
-    function loadNextCard() {
-        isEvaluated = false;
-        const mod = modulesData[currentModuleKey];
-        mod.categories.forEach(cat => {
-            selections[cat.id] = [];
-        });
-        document.querySelectorAll('.option-btn').forEach(btn => {
-            btn.classList.remove('selected', 'btn-correct', 'btn-incorrect', 'btn-missed');
-        });
-        feedbackBox.className = 'feedback-box';
-        feedbackBox.style.display = 'none';
-        submitBtn.textContent = 'Verify Answer';
-        const randomIndex = Math.floor(Math.random() * mod.cards.length);
-        currentCard = mod.cards[randomIndex];
-        greekDisplay.textContent = currentCard.word;
-        greekExample.textContent = currentCard.example;
-        greekExample.setAttribute('data-translation', currentCard.translation);
-        updateHintBadge();
-        updateExampleDisplay();
-        if (autoAudioSwitch.checked) {
-            playAudio();
-        }
-    }
-    function updateMetrics() {
-        streakVal.textContent = streak;
-        if (totalAttempts === 0) {
-            accuracyVal.textContent = '100%';
-        } else {
-            const percentage = Math.round((correctAttempts / totalAttempts) * 100);
-            accuracyVal.textContent = `${percentage}%`;
-        }
-    }
+
+    // Event Handlers for UI Toggles
+    letterCaseSelect.addEventListener('change', () => {
+        if (currentCard) greekDisplay.textContent = formatDisplayWord(currentCard);
+    });
+
+    showStreakSwitch.addEventListener('change', updateMetricsUI);
+    showAccuracySwitch.addEventListener('change', updateMetricsUI);
+
+    exampleSwitch.addEventListener('change', () => {
+        greekExample.style.display = exampleSwitch.checked ? 'block' : 'none';
+    });
+
+    showTablesSwitch.addEventListener('change', () => {
+        if (showTablesSwitch.checked) tablesPanel.classList.add('show');
+        else tablesPanel.classList.remove('show');
+    });
+
     topicSelect.addEventListener('change', (e) => {
         currentModuleKey = e.target.value;
         renderModuleUI();
     });
+
     submitBtn.addEventListener('click', () => {
         if (isEvaluated) {
             loadNextCard();
             return;
         }
+
         const mod = modulesData[currentModuleKey];
-        const missingSelections = mod.categories.some(cat => selections[cat.id].length === 0);
-        if (missingSelections) {
+        const missing = mod.categories.some(cat => selections[cat.id].length === 0);
+        if (missing) {
             feedbackBox.className = 'feedback-box incorrect';
             feedbackBox.textContent = 'Select options across all categories.';
             return;
         }
+
         totalAttempts++;
         const isCorrect = evaluateButtons();
+
+        if (pronounceAnswerSwitch.checked) playAudio();
+
         if (isCorrect) {
             correctAttempts++;
             streak++;
@@ -1009,20 +862,25 @@
             feedbackBox.className = 'feedback-box incorrect';
             feedbackBox.textContent = 'Incorrect';
         }
-        updateMetrics();
+
+        updateMetricsUI();
         isEvaluated = true;
         submitBtn.textContent = 'Next Card';
     });
+
     resetBtn.addEventListener('click', () => {
         streak = 0;
         totalAttempts = 0;
         correctAttempts = 0;
-        updateMetrics();
+        updateMetricsUI();
         loadNextCard();
     });
+
     audioBtn.addEventListener('click', playAudio);
+
     // Initial Execution
     renderModuleUI();
+    updateMetricsUI();
 </script>
 </body>
 </html>
