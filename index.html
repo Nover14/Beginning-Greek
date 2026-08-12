@@ -44,24 +44,25 @@
             align-items: center;
             min-height: 100vh;
             padding: 32px 24px;
+            overflow-x: hidden;
         }
         .app-layout {
             width: 100%;
-            max-width: 1150px;
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            gap: 20px;
             position: relative;
         }
+        /* Main Container: Strictly Centered */
         .main-container {
             width: 100%;
             max-width: 620px;
             display: flex;
             flex-direction: column;
             gap: 16px;
-            position: relative; /* Relative anchor for adjacent reference tables */
+            position: relative; /* Anchor for left & right peripheral panels */
         }
+
         .topic-selector-card {
             background-color: var(--panel-bg);
             border: 1px solid var(--table-border);
@@ -91,8 +92,11 @@
             outline: none;
         }
 
-        /* Settings Card Panel */
+        /* Left Settings Panel: Positioned absolutely relative to centered main container */
         .settings-card {
+            position: absolute;
+            right: calc(100% + 16px);
+            top: 0;
             width: 250px;
             background-color: var(--panel-bg);
             border-radius: 16px;
@@ -103,6 +107,7 @@
             flex-direction: column;
             gap: 12px;
             flex-shrink: 0;
+            z-index: 10;
         }
         .switch-row {
             display: flex;
@@ -154,6 +159,29 @@
         .switch-wrapper input[type="checkbox"]:checked + .switch-slider::before {
             transform: translateX(18px);
         }
+
+        /* Right Reference Panel: Positioned absolutely relative to centered main container */
+        .tables-panel {
+            position: absolute;
+            left: calc(100% + 16px);
+            top: 0;
+            width: 280px;
+            background-color: var(--panel-bg);
+            border-radius: 16px;
+            padding: 14px;
+            border: 1px solid var(--table-border);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 10;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+            max-height: 580px;
+            overflow-y: auto;
+        }
+        .tables-panel.show { opacity: 1; visibility: visible; }
 
         /* Workspaces */
         #flashcard-workspace, #matrix-workspace {
@@ -237,28 +265,6 @@
         }
         .greek-example:hover::after { opacity: 1; }
 
-        /* Tables Panel: Positioned tightly beside main container */
-        .tables-panel {
-            position: absolute;
-            left: calc(100% + 12px);
-            top: 0;
-            width: 280px;
-            background-color: var(--panel-bg);
-            border-radius: 16px;
-            padding: 14px;
-            border: 1px solid var(--table-border);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            z-index: 10;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
-            max-height: 580px;
-            overflow-y: auto;
-        }
-        .tables-panel.show { opacity: 1; visibility: visible; }
         .table-group { display: flex; flex-direction: column; gap: 6px; }
         .table-title { font-size: 0.8rem; font-style: italic; font-weight: 700; color: var(--text-muted); }
         .paradigm-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; background-color: #ffffff; }
@@ -273,7 +279,7 @@
         .verb-table td:nth-child(1) { background-color: var(--col-verb-stem); }
         .verb-table td:nth-child(2) { background-color: var(--col-verb-ending); font-weight: 700; }
 
-        /* Definite Articles Matrix: Side-by-Side Horizontal Layout */
+        /* Definite Articles Matrix: Horizontal Side-by-Side */
         .matrix-board {
             background-color: var(--panel-bg);
             border: 1px solid var(--table-border);
@@ -401,10 +407,19 @@
         .metric-divider { width: 1px; height: 38px; background-color: #cbd5e1; }
         .reset-link { background: none; border: none; color: var(--text-muted); text-decoration: underline; font-size: 0.85rem; cursor: pointer; font-weight: 500; display: block; margin: 2px auto 0 auto; }
         
-        @media (max-width: 980px) {
-            .app-layout { flex-direction: column; align-items: center; }
-            .settings-card { width: 100%; max-width: 620px; }
-            .tables-panel { position: static; width: 100%; }
+        /* Media Breakpoint for Narrow Screens */
+        @media (max-width: 1180px) {
+            body { align-items: flex-start; }
+            .settings-card {
+                position: static;
+                width: 100%;
+                margin-bottom: 12px;
+            }
+            .tables-panel {
+                position: static;
+                width: 100%;
+                max-height: none;
+            }
         }
         @media (max-width: 640px) {
             .matrix-tables-row { flex-direction: column; }
@@ -413,93 +428,95 @@
 </head>
 <body>
 <div class="app-layout">
-    <!-- Left Panel: Dynamic Settings Dashboard -->
-    <div class="settings-card">
-        <!-- Alphabet-Specific Settings -->
-        <label class="switch-row setting-alphabet">
-            <span class="switch-text">Order Mode</span>
-            <span class="switch-wrapper">
-                <input type="checkbox" id="order-mode-switch">
-                <span class="switch-slider"></span>
-            </span>
-        </label>
-        <label class="switch-row setting-alphabet">
-            <span class="switch-text">Alphabetical Order</span>
-            <span class="switch-wrapper">
-                <input type="checkbox" id="alphabetical-switch" checked>
-                <span class="switch-slider"></span>
-            </span>
-        </label>
-        <label class="switch-row setting-alphabet">
-            <span class="switch-text">Weighted Frequency</span>
-            <span class="switch-wrapper">
-                <input type="checkbox" id="weighted-switch" checked>
-                <span class="switch-slider"></span>
-            </span>
-        </label>
-        <label class="switch-row setting-alphabet">
-            <span class="switch-text">Reverse Mode</span>
-            <span class="switch-wrapper">
-                <input type="checkbox" id="reverse-mode-switch">
-                <span class="switch-slider"></span>
-            </span>
-        </label>
-        <div class="switch-row setting-alphabet" style="cursor: default;">
-            <span class="switch-text">Letter Case</span>
-            <select id="letter-case-select" class="setting-dropdown">
-                <option value="both">Both (Α α)</option>
-                <option value="upper">Upper (Α)</option>
-                <option value="lower">Lower (α)</option>
-            </select>
+    <!-- Main Center Container -->
+    <div class="main-container">
+
+        <!-- Left Settings Card (Anchored to Main Container) -->
+        <div class="settings-card">
+            <!-- Alphabet-Specific Settings -->
+            <label class="switch-row setting-alphabet">
+                <span class="switch-text">Order Mode</span>
+                <span class="switch-wrapper">
+                    <input type="checkbox" id="order-mode-switch">
+                    <span class="switch-slider"></span>
+                </span>
+            </label>
+            <label class="switch-row setting-alphabet">
+                <span class="switch-text">Alphabetical Order</span>
+                <span class="switch-wrapper">
+                    <input type="checkbox" id="alphabetical-switch" checked>
+                    <span class="switch-slider"></span>
+                </span>
+            </label>
+            <label class="switch-row setting-alphabet">
+                <span class="switch-text">Weighted Frequency</span>
+                <span class="switch-wrapper">
+                    <input type="checkbox" id="weighted-switch" checked>
+                    <span class="switch-slider"></span>
+                </span>
+            </label>
+            <label class="switch-row setting-alphabet">
+                <span class="switch-text">Reverse Mode</span>
+                <span class="switch-wrapper">
+                    <input type="checkbox" id="reverse-mode-switch">
+                    <span class="switch-slider"></span>
+                </span>
+            </label>
+            <div class="switch-row setting-alphabet" style="cursor: default;">
+                <span class="switch-text">Letter Case</span>
+                <select id="letter-case-select" class="setting-dropdown">
+                    <option value="both">Both (Α α)</option>
+                    <option value="upper">Upper (Α)</option>
+                    <option value="lower">Lower (α)</option>
+                </select>
+            </div>
+
+            <!-- Universal / General Controls -->
+            <label class="switch-row setting-flashcard">
+                <span class="switch-text">Auto Pronounce</span>
+                <span class="switch-wrapper">
+                    <input type="checkbox" id="auto-audio-switch">
+                    <span class="switch-slider"></span>
+                </span>
+            </label>
+            <label class="switch-row setting-flashcard">
+                <span class="switch-text">Pronounce on Answer</span>
+                <span class="switch-wrapper">
+                    <input type="checkbox" id="pronounce-answer-switch">
+                    <span class="switch-slider"></span>
+                </span>
+            </label>
+            <label class="switch-row">
+                <span class="switch-text">Show Streak</span>
+                <span class="switch-wrapper">
+                    <input type="checkbox" id="show-streak-switch" checked>
+                    <span class="switch-slider"></span>
+                </span>
+            </label>
+            <label class="switch-row">
+                <span class="switch-text">Show Accuracy</span>
+                <span class="switch-wrapper">
+                    <input type="checkbox" id="show-accuracy-switch" checked>
+                    <span class="switch-slider"></span>
+                </span>
+            </label>
+            <label class="switch-row setting-flashcard">
+                <span class="switch-text">Show Example</span>
+                <span class="switch-wrapper">
+                    <input type="checkbox" id="example-switch">
+                    <span class="switch-slider"></span>
+                </span>
+            </label>
+            <label class="switch-row setting-flashcard">
+                <span class="switch-text">Show Reference Tables</span>
+                <span class="switch-wrapper">
+                    <input type="checkbox" id="show-tables-switch">
+                    <span class="switch-slider"></span>
+                </span>
+            </label>
         </div>
 
-        <!-- Universal / General Controls -->
-        <label class="switch-row setting-flashcard">
-            <span class="switch-text">Auto Pronounce</span>
-            <span class="switch-wrapper">
-                <input type="checkbox" id="auto-audio-switch">
-                <span class="switch-slider"></span>
-            </span>
-        </label>
-        <label class="switch-row setting-flashcard">
-            <span class="switch-text">Pronounce on Answer</span>
-            <span class="switch-wrapper">
-                <input type="checkbox" id="pronounce-answer-switch">
-                <span class="switch-slider"></span>
-            </span>
-        </label>
-        <label class="switch-row">
-            <span class="switch-text">Show Streak</span>
-            <span class="switch-wrapper">
-                <input type="checkbox" id="show-streak-switch" checked>
-                <span class="switch-slider"></span>
-            </span>
-        </label>
-        <label class="switch-row">
-            <span class="switch-text">Show Accuracy</span>
-            <span class="switch-wrapper">
-                <input type="checkbox" id="show-accuracy-switch" checked>
-                <span class="switch-slider"></span>
-            </span>
-        </label>
-        <label class="switch-row setting-flashcard">
-            <span class="switch-text">Show Example</span>
-            <span class="switch-wrapper">
-                <input type="checkbox" id="example-switch">
-                <span class="switch-slider"></span>
-            </span>
-        </label>
-        <label class="switch-row setting-flashcard">
-            <span class="switch-text">Show Reference Tables</span>
-            <span class="switch-wrapper">
-                <input type="checkbox" id="show-tables-switch">
-                <span class="switch-slider"></span>
-            </span>
-        </label>
-    </div>
-
-    <!-- Main Workspace -->
-    <div class="main-container">
+        <!-- Topic Selector Header -->
         <div class="topic-selector-card">
             <span class="topic-label">Grammar Module</span>
             <select id="topic-select" class="topic-dropdown">
@@ -564,7 +581,9 @@
             <div class="articles-pool-card" id="articles-pool"></div>
         </div>
 
+        <!-- Right Reference Panel (Anchored to Main Container) -->
         <div class="tables-panel" id="tables-panel"></div>
+
         <button id="submit-btn" class="action-btn">Verify Answer</button>
         <div id="feedback" class="feedback-box"></div>
 
@@ -824,18 +843,16 @@
         }
     }
 
-    /* --- Definite Articles Drag & Drop Game Engine --- */
+    /* --- Definite Articles Matrix Game Engine --- */
     function initArticlesMatrixGame() {
         articlesPool.innerHTML = '';
         selectedChipElement = null;
 
-        // Reset matrix drop zones
         document.querySelectorAll('#matrix-workspace .drop-zone').forEach(zone => {
             zone.innerHTML = '';
             zone.className = 'drop-zone';
         });
 
-        // Shuffle articles
         const items = [...modulesData.articles.items].sort(() => Math.random() - 0.5);
 
         items.forEach((art, index) => {
@@ -845,13 +862,11 @@
             chip.setAttribute('id', `chip-${index}`);
             chip.textContent = art;
 
-            // Drag Events
             chip.addEventListener('dragstart', (e) => {
                 if (isEvaluated) return;
                 e.dataTransfer.setData('text/plain', chip.id);
             });
 
-            // Click-to-Place Support
             chip.addEventListener('click', (e) => {
                 if (isEvaluated) return;
                 e.stopPropagation();
@@ -867,7 +882,6 @@
             articlesPool.appendChild(chip);
         });
 
-        // Attach Drop-Zone Listeners
         document.querySelectorAll('#matrix-workspace .drop-zone').forEach(zone => {
             zone.addEventListener('dragover', (e) => {
                 e.preventDefault();
@@ -896,7 +910,6 @@
             });
         });
 
-        // Click bank to return chips
         articlesPool.addEventListener('click', () => {
             if (selectedChipElement && selectedChipElement.parentElement !== articlesPool) {
                 articlesPool.appendChild(selectedChipElement);
