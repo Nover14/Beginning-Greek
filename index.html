@@ -60,7 +60,7 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
-            position: relative; /* Anchor for left & right peripheral panels */
+            position: relative;
         }
 
         .topic-selector-card {
@@ -92,7 +92,7 @@
             outline: none;
         }
 
-        /* Left Settings Panel: Positioned absolutely relative to centered main container */
+        /* Settings Panel: Flanked Left */
         .settings-card {
             position: absolute;
             right: calc(100% + 16px);
@@ -471,6 +471,16 @@
                 </select>
             </div>
 
+            <!-- Definite Articles-Specific Settings -->
+            <div class="switch-row setting-articles" style="cursor: default; display: none;">
+                <span class="switch-text">Number Scope</span>
+                <select id="article-number-select" class="setting-dropdown">
+                    <option value="both">Both</option>
+                    <option value="singular">Singular Only</option>
+                    <option value="plural">Plural Only</option>
+                </select>
+            </div>
+
             <!-- Universal / General Controls -->
             <label class="switch-row setting-flashcard">
                 <span class="switch-text">Auto Pronounce</span>
@@ -549,7 +559,7 @@
             <div class="matrix-board">
                 <div class="matrix-tables-row">
                     <!-- Singular Matrix -->
-                    <div class="table-group">
+                    <div class="table-group" id="singular-matrix-group">
                         <div class="table-title">Singular Declension Matrix</div>
                         <table class="paradigm-table article-table">
                             <thead><tr><th></th><th>m.</th><th>f.</th><th>n.</th></tr></thead>
@@ -562,7 +572,7 @@
                         </table>
                     </div>
                     <!-- Plural Matrix -->
-                    <div class="table-group">
+                    <div class="table-group" id="plural-matrix-group">
                         <div class="table-title">Plural Declension Matrix</div>
                         <table class="paradigm-table article-table">
                             <thead><tr><th></th><th>m.</th><th>f.</th><th>n.</th></tr></thead>
@@ -679,16 +689,8 @@
             `
         },
         articles: {
-            items: [
-                'ὁ', 'ἡ', 'τό',
-                'τόν', 'τήν', 'τό',
-                'τοῦ', 'τῆς', 'τοῦ',
-                'τῷ', 'τῇ', 'τῷ',
-                'οἱ', 'αἱ', 'τά',
-                'τούς', 'τάς', 'τά',
-                'τῶν', 'τῶν', 'τῶν',
-                'τοῖς', 'ταῖς', 'τοῖς'
-            ]
+            singularItems: ['ὁ', 'ἡ', 'τό', 'τόν', 'τήν', 'τό', 'τοῦ', 'τῆς', 'τοῦ', 'τῷ', 'τῇ', 'τῷ'],
+            pluralItems: ['οἱ', 'αἱ', 'τά', 'τούς', 'τάς', 'τά', 'τῶν', 'τῶν', 'τῶν', 'τοῖς', 'ταῖς', 'τοῖς']
         },
         verbs: {
             categories: [
@@ -760,6 +762,7 @@
     const weightedSwitch = document.getElementById('weighted-switch');
     const reverseModeSwitch = document.getElementById('reverse-mode-switch');
     const letterCaseSelect = document.getElementById('letter-case-select');
+    const articleNumberSelect = document.getElementById('article-number-select');
     const autoAudioSwitch = document.getElementById('auto-audio-switch');
     const pronounceAnswerSwitch = document.getElementById('pronounce-answer-switch');
     const showStreakSwitch = document.getElementById('show-streak-switch');
@@ -770,16 +773,20 @@
     function updateSettingsVisibility() {
         const alphabetSettings = document.querySelectorAll('.setting-alphabet');
         const flashcardSettings = document.querySelectorAll('.setting-flashcard');
+        const articleSettings = document.querySelectorAll('.setting-articles');
 
         if (currentModuleKey === 'alphabet') {
             alphabetSettings.forEach(el => el.style.display = 'flex');
             flashcardSettings.forEach(el => el.style.display = 'flex');
+            articleSettings.forEach(el => el.style.display = 'none');
         } else if (currentModuleKey === 'verbs') {
             alphabetSettings.forEach(el => el.style.display = 'none');
             flashcardSettings.forEach(el => el.style.display = 'flex');
+            articleSettings.forEach(el => el.style.display = 'none');
         } else if (currentModuleKey === 'articles') {
             alphabetSettings.forEach(el => el.style.display = 'none');
             flashcardSettings.forEach(el => el.style.display = 'none');
+            articleSettings.forEach(el => el.style.display = 'flex');
             tablesPanel.classList.remove('show');
         }
     }
@@ -848,12 +855,32 @@
         articlesPool.innerHTML = '';
         selectedChipElement = null;
 
+        const singularGroup = document.getElementById('singular-matrix-group');
+        const pluralGroup = document.getElementById('plural-matrix-group');
+        const scope = articleNumberSelect.value;
+
+        let items = [];
+
+        if (scope === 'singular') {
+            singularGroup.style.display = 'flex';
+            pluralGroup.style.display = 'none';
+            items = [...modulesData.articles.singularItems];
+        } else if (scope === 'plural') {
+            singularGroup.style.display = 'none';
+            pluralGroup.style.display = 'flex';
+            items = [...modulesData.articles.pluralItems];
+        } else {
+            singularGroup.style.display = 'flex';
+            pluralGroup.style.display = 'flex';
+            items = [...modulesData.articles.singularItems, ...modulesData.articles.pluralItems];
+        }
+
         document.querySelectorAll('#matrix-workspace .drop-zone').forEach(zone => {
             zone.innerHTML = '';
             zone.className = 'drop-zone';
         });
 
-        const items = [...modulesData.articles.items].sort(() => Math.random() - 0.5);
+        items.sort(() => Math.random() - 0.5);
 
         items.forEach((art, index) => {
             const chip = document.createElement('div');
@@ -927,7 +954,14 @@
     }
 
     function evaluateArticlesMatrix() {
-        const zones = document.querySelectorAll('#matrix-workspace .drop-zone');
+        const visibleGroups = document.querySelectorAll('#matrix-workspace .table-group');
+        let zones = [];
+        visibleGroups.forEach(group => {
+            if (group.style.display !== 'none') {
+                group.querySelectorAll('.drop-zone').forEach(z => zones.push(z));
+            }
+        });
+
         let allCorrect = true;
         let filledCount = 0;
 
@@ -1069,6 +1103,12 @@
     // Controls Handlers
     letterCaseSelect.addEventListener('change', () => {
         if (currentCard) greekDisplay.textContent = formatDisplayWord(currentCard);
+    });
+
+    articleNumberSelect.addEventListener('change', () => {
+        if (currentModuleKey === 'articles') {
+            renderModuleUI();
+        }
     });
 
     showStreakSwitch.addEventListener('change', updateMetricsUI);
