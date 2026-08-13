@@ -160,12 +160,12 @@
             transform: translateX(18px);
         }
 
-        /* Right Reference Panel: Positioned absolutely relative to centered main container */
+        /* Right Reference Panel */
         .tables-panel {
             position: absolute;
             left: calc(100% + 16px);
             top: 0;
-            width: 280px;
+            width: 290px;
             background-color: var(--panel-bg);
             border-radius: 16px;
             padding: 14px;
@@ -227,14 +227,14 @@
         .speaker-icon:hover { opacity: 0.7; }
         .greek-target {
             font-family: "Georgia", "Times New Roman", serif;
-            font-size: 3.5rem;
+            font-size: 3.2rem;
             font-weight: 400;
             color: var(--btn-text);
             line-height: 1;
         }
         .greek-example {
             font-family: "Georgia", "Times New Roman", serif;
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             color: var(--text-muted);
             display: none;
             position: absolute;
@@ -271,7 +271,7 @@
         .paradigm-table th, .paradigm-table td { border: 1px solid var(--table-border); padding: 5px 6px; text-align: center; }
         .paradigm-table thead th { font-weight: 700; font-size: 0.75rem; color: var(--btn-text); background-color: var(--table-header-bg); }
         .paradigm-table tbody th { background-color: var(--table-header-bg); color: var(--text-muted); font-style: italic; font-weight: 600; text-align: left; white-space: nowrap; font-size: 0.75rem; }
-        .paradigm-table td { font-family: "Georgia", "Times New Roman", serif; font-size: 0.9rem; color: var(--btn-text); }
+        .paradigm-table td { font-family: "Georgia", "Times New Roman", serif; font-size: 0.88rem; color: var(--btn-text); }
         
         .article-table th:nth-child(2), .article-table td:nth-child(2) { background-color: var(--col-masculine); }
         .article-table th:nth-child(3), .article-table td:nth-child(3) { background-color: var(--col-feminine); }
@@ -360,16 +360,16 @@
         /* Options Buttons */
         .selection-groups { display: flex; flex-direction: column; gap: 14px; }
         .group-label { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
-        .buttons-row { display: flex; flex-wrap: wrap; gap: 10px; }
+        .buttons-row { display: flex; flex-wrap: wrap; gap: 8px; }
         .option-btn {
-            flex: 1 1 calc(25% - 10px);
-            min-width: 70px;
-            padding: 12px 8px;
+            flex: 1 1 calc(20% - 8px);
+            min-width: 60px;
+            padding: 10px 6px;
             background-color: var(--btn-bg);
             border: 1.5px solid var(--btn-border);
-            border-radius: 12px;
+            border-radius: 10px;
             font-family: "Georgia", "Times New Roman", serif;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 700;
             color: var(--btn-text);
             cursor: pointer;
@@ -431,7 +431,7 @@
     <!-- Main Center Container -->
     <div class="main-container">
 
-        <!-- Left Settings Card (Anchored to Main Container) -->
+        <!-- Left Settings Card -->
         <div class="settings-card">
             <!-- Alphabet-Specific Settings -->
             <label class="switch-row setting-alphabet">
@@ -471,7 +471,7 @@
                 </select>
             </div>
 
-            <!-- Definite Articles-Specific Settings -->
+            <!-- Articles / Adjectives Settings -->
             <div class="switch-row setting-articles" style="cursor: default; display: none;">
                 <span class="switch-text">Number Scope</span>
                 <select id="article-number-select" class="setting-dropdown">
@@ -481,7 +481,7 @@
                 </select>
             </div>
 
-            <!-- Universal / General Controls -->
+            <!-- Universal Controls -->
             <label class="switch-row setting-flashcard">
                 <span class="switch-text">Auto Pronounce</span>
                 <span class="switch-wrapper">
@@ -533,10 +533,11 @@
                 <option value="alphabet">Koine Greek Alphabet</option>
                 <option value="articles">Definite Articles</option>
                 <option value="verbs">Verb Forms (Present Active)</option>
+                <option value="adjectives">Adjective Forms (1st/2nd Decl.)</option>
             </select>
         </div>
 
-        <!-- Workspace 1: Standard Flashcard (Alphabet & Verbs) -->
+        <!-- Workspace 1: Flashcard Parsing -->
         <div id="flashcard-workspace">
             <div class="flashcard-display">
                 <button class="speaker-icon" id="audio-btn" title="Listen">
@@ -554,11 +555,10 @@
             <div class="selection-groups" id="selection-groups-container"></div>
         </div>
 
-        <!-- Workspace 2: Drag & Drop Game (Definite Articles) -->
+        <!-- Workspace 2: Drag & Drop Matrix (Definite Articles) -->
         <div id="matrix-workspace" style="display: none;">
             <div class="matrix-board">
                 <div class="matrix-tables-row">
-                    <!-- Singular Matrix -->
                     <div class="table-group" id="singular-matrix-group">
                         <div class="table-title">Singular Declension Matrix</div>
                         <table class="paradigm-table article-table">
@@ -571,7 +571,6 @@
                             </tbody>
                         </table>
                     </div>
-                    <!-- Plural Matrix -->
                     <div class="table-group" id="plural-matrix-group">
                         <div class="table-title">Plural Declension Matrix</div>
                         <table class="paradigm-table article-table">
@@ -586,12 +585,11 @@
                     </div>
                 </div>
             </div>
-            <!-- Bank of Draggable Articles -->
             <div class="table-title">Articles Bank (Drag or Click to Place)</div>
             <div class="articles-pool-card" id="articles-pool"></div>
         </div>
 
-        <!-- Right Reference Panel (Anchored to Main Container) -->
+        <!-- Right Reference Panel -->
         <div class="tables-panel" id="tables-panel"></div>
 
         <button id="submit-btn" class="action-btn">Verify Answer</button>
@@ -727,6 +725,62 @@
                     </table>
                 </div>
             `
+        },
+        adjectives: {
+            categories: [
+                { id: 'case', label: 'CASE', options: ['Nom', 'Acc', 'Gen', 'Dat', 'Voc'] },
+                { id: 'gender', label: 'GENDER', options: ['Masc', 'Fem', 'Neut'] },
+                { id: 'number', label: 'NUMBER', options: ['Singular', 'Plural'] }
+            ],
+            cards: [
+                /* Singular */
+                { word: 'καλός', example: 'ὁ καλὸς διδάσκαλος', translation: 'the good teacher', case: ['Nom'], gender: ['Masc'], number: ['Singular'] },
+                { word: 'καλή', example: 'ἡ καλὴ γυνή', translation: 'the good woman', case: ['Nom'], gender: ['Fem'], number: ['Singular'] },
+                { word: 'καλόν', example: 'τὸ καλὸν ἔργον', translation: 'the good work / disciple (nom./acc.)', case: ['Nom', 'Acc'], gender: ['Masc', 'Neut'], number: ['Singular'] },
+                { word: 'καλήν', example: 'τὴν καλὴν ἐλπίδα', translation: 'the good hope', case: ['Acc'], gender: ['Fem'], number: ['Singular'] },
+                { word: 'καλοῦ', example: 'τοῦ καλοῦ δένδρου', translation: 'of the good tree / man', case: ['Gen'], gender: ['Masc', 'Neut'], number: ['Singular'] },
+                { word: 'καλῆς', example: 'τῆς καλῆς καρδίας', translation: 'of the good heart', case: ['Gen'], gender: ['Fem'], number: ['Singular'] },
+                { word: 'καλῷ', example: 'τῷ καλῷ λόγῳ', translation: 'to/for the good word', case: ['Dat'], gender: ['Masc', 'Neut'], number: ['Singular'] },
+                { word: 'καλῇ', example: 'τῇ καλῇ πίστει', translation: 'in the good faith', case: ['Dat'], gender: ['Fem'], number: ['Singular'] },
+                { word: 'καλέ', example: 'ὦ καλέ διδάσκαλε', translation: 'O good teacher!', case: ['Voc'], gender: ['Masc'], number: ['Singular'] },
+
+                /* Plural */
+                { word: 'καλοί', example: 'οἱ καλοὶ ἄνθρωποι', translation: 'the good people', case: ['Nom'], gender: ['Masc'], number: ['Plural'] },
+                { word: 'καλαί', example: 'αἱ καλαὶ ἡμέραι', translation: 'the good days', case: ['Nom'], gender: ['Fem'], number: ['Plural'] },
+                { word: 'καλά', example: 'τὰ καλὰ δῶρα', translation: 'the good gifts (nom./acc.)', case: ['Nom', 'Acc'], gender: ['Neut'], number: ['Plural'] },
+                { word: 'καλούς', example: 'τοὺς καλοὺς μαθητάς', translation: 'the good disciples', case: ['Acc'], gender: ['Masc'], number: ['Plural'] },
+                { word: 'καλάς', example: 'τὰς καλὰς γραφάς', translation: 'the good writings', case: ['Acc'], gender: ['Fem'], number: ['Plural'] },
+                { word: 'καλῶν', example: 'τῶν καλῶν ἔργων', translation: 'of the good works / people / women', case: ['Gen'], gender: ['Masc', 'Fem', 'Neut'], number: ['Plural'] },
+                { word: 'καλοῖς', example: 'τοῖς καλοῖς φίλοις', translation: 'to/for the good friends', case: ['Dat'], gender: ['Masc', 'Neut'], number: ['Plural'] },
+                { word: 'καλαῖς', example: 'ταῖς καλαῖς γυναιξίν', translation: 'to/for the good women', case: ['Dat'], gender: ['Fem'], number: ['Plural'] }
+            ],
+            tableHTML: `
+                <div class="table-group">
+                    <div class="table-title">καλ-ός -ή -όν ('fine, beautiful, good')</div>
+                    <div style="font-size: 0.72rem; font-weight: 800; color: var(--text-muted); margin-top: 4px; text-transform: uppercase;">Singular</div>
+                    <table class="paradigm-table article-table">
+                        <thead><tr><th></th><th>m.</th><th>f.</th><th>n.</th></tr></thead>
+                        <tbody>
+                            <tr><th>Nom.</th><td>καλ-ός</td><td>καλ-ή</td><td>καλ-όν</td></tr>
+                            <tr><th>Acc.</th><td>καλ-όν</td><td>καλ-ήν</td><td>καλ-όν</td></tr>
+                            <tr><th>Gen.</th><td>καλ-οῦ</td><td>καλ-ῆς</td><td>καλ-οῦ</td></tr>
+                            <tr><th>Dat.</th><td>καλ-ῷ</td><td>καλ-ῇ</td><td>καλ-ῷ</td></tr>
+                            <tr><th>Vocative</th><td>καλ-έ</td><td>—</td><td>—</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div style="font-size: 0.72rem; font-weight: 800; color: var(--text-muted); margin-top: 10px; text-transform: uppercase;">Plural</div>
+                    <table class="paradigm-table article-table">
+                        <thead><tr><th></th><th>m.</th><th>f.</th><th>n.</th></tr></thead>
+                        <tbody>
+                            <tr><th>Nom.</th><td>καλ-οί</td><td>καλ-αί</td><td>καλ-ά</td></tr>
+                            <tr><th>Acc.</th><td>καλ-ούς</td><td>καλ-άς</td><td>καλ-ά</td></tr>
+                            <tr><th>Gen.</th><td>καλ-ῶν</td><td>καλ-ῶν</td><td>καλ-ῶν</td></tr>
+                            <tr><th>Dat.</th><td>καλ-οῖς</td><td>καλ-αῖς</td><td>καλ-οῖς</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `
         }
     };
 
@@ -788,6 +842,10 @@
             flashcardSettings.forEach(el => el.style.display = 'none');
             articleSettings.forEach(el => el.style.display = 'flex');
             tablesPanel.classList.remove('show');
+        } else if (currentModuleKey === 'adjectives') {
+            alphabetSettings.forEach(el => el.style.display = 'none');
+            flashcardSettings.forEach(el => el.style.display = 'flex');
+            articleSettings.forEach(el => el.style.display = 'flex');
         }
     }
 
@@ -850,7 +908,7 @@
         }
     }
 
-    /* --- Definite Articles Matrix Game Engine --- */
+    /* Definite Articles Matrix Engine */
     function initArticlesMatrixGame() {
         articlesPool.innerHTML = '';
         selectedChipElement = null;
@@ -1000,7 +1058,7 @@
         submitBtn.textContent = 'New Matrix Game';
     }
 
-    /* --- Standard Flashcard Engine --- */
+    /* Standard Flashcard Engine */
     function formatDisplayWord(card) {
         if (currentModuleKey === 'alphabet') {
             const mode = letterCaseSelect.value;
@@ -1024,18 +1082,29 @@
         feedbackBox.style.display = 'none';
         submitBtn.textContent = 'Verify Answer';
 
+        /* Scope filtering for Adjectives & Articles */
+        let availableCards = mod.cards;
+        if (currentModuleKey === 'adjectives') {
+            const scope = articleNumberSelect.value;
+            if (scope === 'singular') {
+                availableCards = mod.cards.filter(c => c.number.includes('Singular'));
+            } else if (scope === 'plural') {
+                availableCards = mod.cards.filter(c => c.number.includes('Plural'));
+            }
+        }
+
         let cardIndex = 0;
         if (currentModuleKey === 'alphabet' && orderModeSwitch.checked) {
-            cardIndex = sequentialIndex % mod.cards.length;
+            cardIndex = sequentialIndex % availableCards.length;
             if (reverseModeSwitch.checked) {
-                cardIndex = (mod.cards.length - 1) - cardIndex;
+                cardIndex = (availableCards.length - 1) - cardIndex;
             }
             sequentialIndex++;
         } else {
-            cardIndex = Math.floor(Math.random() * mod.cards.length);
+            cardIndex = Math.floor(Math.random() * availableCards.length);
         }
 
-        currentCard = mod.cards[cardIndex];
+        currentCard = availableCards[cardIndex];
         greekDisplay.textContent = formatDisplayWord(currentCard);
         greekExample.textContent = currentCard.example;
         greekExample.setAttribute('data-translation', currentCard.translation);
@@ -1108,6 +1177,8 @@
     articleNumberSelect.addEventListener('change', () => {
         if (currentModuleKey === 'articles') {
             renderModuleUI();
+        } else if (currentModuleKey === 'adjectives') {
+            loadNextCard();
         }
     });
 
